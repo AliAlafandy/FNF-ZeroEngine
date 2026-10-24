@@ -33,12 +33,14 @@
 	<define name="DISCORD_ALLOWED" if="desktop"/>
 
 	<define name="COPYSTATE_ALLOWED" if="MODS_ALLOWED mobile"/>
+	<define name="CHECK_FOR_UPDATES"/>
 	<define name="NO_PRELOAD_ALL"/>
 
 	<define name="BASE_GAME_FILES"/>
 	<define name="VIDEOS_ALLOWED" if="desktop || mobile" unless="32bits || hl || NOVIDEO || rpi"/> <!-- i'll keep this cuz it makes vscode think i don't use videos -->
 
 	<section if="officialBuild">
+		<define name="PSYCH_WATERMARKS"/>
 		<define name="TITLE_SCREEN_EASTER_EGG"/>
 	</section>
 
