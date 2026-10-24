@@ -1393,7 +1393,7 @@ class FunkinLua {
 			if(Assets.exists(path))
 			#end
 			{
-				var shit:DialogueFile = DialogueBoZero.parseDialogue(path);
+				var shit:DialogueFile = DialogueBoxZero.parseDialogue(path);
 				if(shit.dialogue.length > 0) {
 					game.startDialogue(shit, music);
 					luaTrace('startDialogue: Successfully loaded dialogue', false, false, FlxColor.GREEN);
