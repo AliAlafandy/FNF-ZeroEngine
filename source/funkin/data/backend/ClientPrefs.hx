@@ -116,9 +116,9 @@ class ClientPrefs {
 	//Every key has two binds, add your key bind down here and then add your control on options/ControlsSubState.hx and Controls.hx
 	public static var keyBinds:Map<String, Array<FlxKey>> = [
 		//Key Bind, Name for ControlsSubState
-		'note_up' => [D, UP], // W
-		'note_left' => [F, LEFT], // A
-		'note_down' => [J, DOWN], // S
+		'note_up' => [J, UP], // W
+		'note_left' => [D, LEFT], // A
+		'note_down' => [F, DOWN], // S
 		'note_right' => [K, RIGHT], // D
 
 		'ui_up'	=> [W, UP],
