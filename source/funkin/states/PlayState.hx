@@ -600,7 +600,7 @@ class PlayState extends MusicBeatState
 			uiGroup.add(engineTxt);
 
 			if (ClientPrefs.data.downScroll) {
-				engineTxt.y = (FlxG.height * 0.9) + 45;
+				engineTxt.y = FlxG.height * 0.9 + 45;
 			}
 		}
 		engineNamesList();
@@ -608,13 +608,13 @@ class PlayState extends MusicBeatState
 		switch (ClientPrefs.data.enginemarkStyle) {
 			case 'Kade Engine':
 				if (ClientPrefs.data.randomEngineNames) {
-					if (ClientPrefs.data.botplayName == 'Song Name') {
+					if (ClientPrefs.data.botplayName == 'Song Name' && cpuControlled || ClientPrefs.data.timeBarType == 'Song Name') {
 						engineTxt.text = Difficulty.getString().toUpperCase() + " | " + engineName + " v" + MainMenuState.zeroEngineVersion;
 					} else {
 						engineTxt.text = SONG.song + " - " + Difficulty.getString().toUpperCase() + " | " + engineName + " v" + MainMenuState.zeroEngineVersion;
 					}
 				} else {
-					if (ClientPrefs.data.botplayName == 'Song Name') {
+					if (ClientPrefs.data.botplayName == 'Song Name' && cpuControlled || ClientPrefs.data.timeBarType == 'Song Name') {
 						engineTxt.text = Difficulty.getString().toUpperCase() + " | Zero Engine v" + MainMenuState.zeroEngineVersion;
 					} else {
 						engineTxt.text = SONG.song + " - " + Difficulty.getString().toUpperCase() + " | Zero Engine v" + MainMenuState.zeroEngineVersion;
@@ -648,31 +648,20 @@ class PlayState extends MusicBeatState
 			uiGroup.add(scoreTxt);
 		}
 
+		botplayTxt = new FlxText(400, timeBar.y + 55, FlxG.width - 800, "", 32);
+		botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		botplayTxt.scrollFactor.set();
+		botplayTxt.borderSize = 1.25;
+		botplayTxt.visible = cpuControlled;
+		uiGroup.add(botplayTxt);
 		if(ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
+
 		switch (ClientPrefs.data.botplayName) {
 			case 'Normal':
-				botplayTxt = new FlxText(400, timeBar.y + 55, FlxG.width - 800, "BOTPLAY", 32);
-				botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-				botplayTxt.scrollFactor.set();
-				botplayTxt.borderSize = 1.25;
-				botplayTxt.visible = cpuControlled;
-				uiGroup.add(botplayTxt);
+				botplayTxt.text = "BOTPLAY";
 			
 			case 'Song Name':
-				botplayTxt = new FlxText(400, timeBar.y + 55, FlxG.width - 800, SONG.song, 32);
-				botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-				botplayTxt.scrollFactor.set();
-				botplayTxt.borderSize = 1.25;
-				botplayTxt.visible = cpuControlled;
-				uiGroup.add(botplayTxt);
-
-			case 'None':
-				botplayTxt = new FlxText(400, timeBar.y + 55, FlxG.width - 800, "", 32);
-				botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-				botplayTxt.scrollFactor.set();
-				botplayTxt.borderSize = 1.25;
-				botplayTxt.visible = cpuControlled;
-				uiGroup.add(botplayTxt);
+				botplayTxt.text = SONG.song;
 		}
 
 		lyricsBG = new FlxSprite();
