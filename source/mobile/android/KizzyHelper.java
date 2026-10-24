@@ -24,7 +24,7 @@ public class KizzyHelper extends Extension {
     private static MediaSession mediaSession;
     private static NotificationManager notificationManager;
 
-    private static final String CHANNEL_ID = "me_silent_mode_v1"; 
+    private static final String CHANNEL_ID = "zero_silent_mode_v1"; 
     private static final int NOTIFICATION_ID = 111;
     private static final String TAG = "KizzyHelper";
 
@@ -37,7 +37,7 @@ public class KizzyHelper extends Extension {
                 try {
                     Context context = Extension.mainContext;
                     if (mediaSession == null) {
-                        mediaSession = new MediaSession(context, "ModSession");
+                        mediaSession = new MediaSession(context, "ZeroSession");
                         mediaSession.setCallback(new MediaSession.Callback() {});
                         mediaSession.setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS | MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);
                         mediaSession.setActive(true);
