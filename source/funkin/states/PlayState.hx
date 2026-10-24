@@ -944,14 +944,14 @@ class PlayState extends MusicBeatState
 		var bfColor = FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]);
 
 		if ((dadColor == FlxColor.BLACK && !SONG.notes[curSection].mustHitSection)
-			|| (gfColor == FlxColor.BLACK && SONG.notes[curSection].gfSection)
+			|| (gfColor == FlxColor.BLACK && SONG.notes[curSection].gfSection && !stageData.hide_girlfriend)
 			|| (bfColor == FlxColor.BLACK && SONG.notes[curSection].mustHitSection)) {
 			lyricsText.color = FlxColor.WHITE;
 		} else {
 			if (!SONG.notes[curSection].mustHitSection) {
 				lyricsText.color = dadColor;
 			}
-			if (SONG.notes[curSection].gfSection) {
+			if (SONG.notes[curSection].gfSection && !stageData.hide_girlfriend) {
 				lyricsText.color = gfColor;
 			}
 			if (SONG.notes[curSection].mustHitSection) {
