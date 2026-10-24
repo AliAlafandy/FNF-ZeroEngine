@@ -3505,9 +3505,9 @@ class ChartingState extends MusicBeatState
 	private function saveLevel()
 	{
 		if(_song.events != null && _song.events.length > 1) _song.events.sort(sortByTime);
-		var formatChart:Dynamic = {
+		/*var formatChart:Dynamic = {
 			format: _song.format
-		};
+		};*/
 		var json = {
 			"song": _song
 		};
@@ -3537,10 +3537,8 @@ class ChartingState extends MusicBeatState
 	{
 		if(_song.events != null && _song.events.length > 1) _song.events.sort(sortByTime);
 		var eventsSong:Dynamic = {
-			events: _song.events
-		};
-		var formatChart:Dynamic = {
-			format: _song.format
+			events: _song.events,
+			format: _song.format // formatChart
 		};
 		var json = {
 			"song": eventsSong
