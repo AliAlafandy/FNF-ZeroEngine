@@ -226,7 +226,7 @@ class PlayState extends MusicBeatState
 	public var dancingLeft:Bool = false;
 
 	public var engineTxt:FlxText;
-	public var randomName:Int = FlxG.random.int(0, 20); // 19
+	public var randomName:Int = FlxG.random.int(0, 26); // 25
 	public var engineName:String = '';
 
 	public var songScore:Int = 0;
@@ -598,10 +598,13 @@ class PlayState extends MusicBeatState
 			engineTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
 			engineTxt.scrollFactor.set();
 			uiGroup.add(engineTxt);
+
+			if (ClientPrefs.data.downScroll) {
+				engineTxt.y = (FlxG.height * 0.9) + 45;
+			}
 		}
 		engineNamesList();
 
-		if (ClientPrefs.data.downScroll) engineTxt.y = (FlxG.height * 0.9) + 45;
 		switch (ClientPrefs.data.enginemarkStyle) {
 			case 'Kade Engine':
 				if (ClientPrefs.data.randomEngineNames) {
@@ -860,23 +863,28 @@ class PlayState extends MusicBeatState
 	        case 3: engineName = 'BS Engine';
 	        case 4: engineName = 'CDEV Engine';
 			//forget that codename engine
-	        case 5: engineName = 'Forever Engine';
-	        case 6: engineName = 'FPS Plus';
-	        case 7: engineName = 'JS Engine';
-	        case 8: engineName = 'Kade Engine';
-	        case 9: engineName = "Mic'd UP";
-	        case 10: engineName = "Mods Engine";
-	        case 11: engineName = 'Nightmare Vision'; 
-	        case 12: engineName = 'NovaFlare Engine';
-	        case 13: engineName = 'OS Engine';
-	        case 14: engineName = 'P Slice';
-	        case 15: engineName = 'Play Engine';
-	        case 16: engineName = 'Psych Engine';
-	        case 17: engineName = 'ReBound Engine';
-	        case 18: engineName = 'SB Engine';
-	        case 19: engineName = 'Tr1ngle Engine';
-	        case 20: engineName = 'V Slice';
-	        case 21: engineName = 'Zero Engine';
+			case 5: engineName = 'Doido Engine';
+	        case 6: engineName = 'Forever Engine';
+	        case 7: engineName = 'FPS Plus';
+	        case 8: engineName = 'JS Engine';
+	        case 9: engineName = 'Kade Engine';
+			case 10: engineName = 'Leather Engine';
+	        case 11: engineName = "Mic'd UP";
+			case 12: engineName = 'Modding Plus';
+	        case 13: engineName = "Mods Engine";
+	        case 14: engineName = 'Nightmare Vision'; 
+	        case 15: engineName = 'NovaFlare Engine';
+	        case 16: engineName = 'OS Engine';
+	        case 17: engineName = 'P Slice';
+	        case 18: engineName = 'Play Engine';
+			case 19: engineName = 'Plus Engine';
+	        case 20: engineName = 'Psych Engine';
+	        case 21: engineName = 'ReBound Engine';
+	        case 22: engineName = 'SB Engine';
+	        case 23: engineName = 'Tr1ngle Engine';
+			case 24: engineName = 'Unknown Engine';
+	        case 25: engineName = 'V Slice';
+	        case 26: engineName = 'Zero Engine';
 			//unknown engine
 	        default: engineName = 'Zero Engine';
 		}
@@ -3617,10 +3625,10 @@ class PlayState extends MusicBeatState
 
 		if (startedCountdown && ClientPrefs.data.randomEngineNames) {
 		    if (dancingLeft) {
-				randomName = FlxG.random.int(0, 20); // 19
+				randomName = FlxG.random.int(0, 26); // 25
 				// engineNamesList();
 			} else {
-				randomName = FlxG.random.int(0, 20); // 19
+				randomName = FlxG.random.int(0, 26); // 25
 				// engineNamesList();
 			}
 		}
