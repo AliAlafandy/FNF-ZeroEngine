@@ -45,7 +45,7 @@ class TitleState extends MusicBeatState
 
 	public static var initialized:Bool = false;
 
-	public static var checkingToastMessage:Bool = false;
+	public static var checkingToastMessage:Bool = true;
 
 	var blackScreen:FlxSprite;
 	var credGroup:FlxGroup;
