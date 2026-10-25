@@ -149,7 +149,7 @@ class PlayState extends MusicBeatState
 	public static var stageUI:String = "normal";
 	public static var isPixelStage(get, never):Bool;
 
-	public var stageData:StageFile = StageData.getStageFile(curStage);
+	public var stageData:StageFile;
 
 	@:noCompletion
 	static function get_isPixelStage():Bool
@@ -369,7 +369,7 @@ class PlayState extends MusicBeatState
 		}
 		curStage = SONG.stage;
 
-		// stageData
+		stageData = StageData.getStageFile(curStage);
 		if(stageData == null) { //Stage couldn't be found, create a dummy stage for preventing a crash
 			stageData = StageData.dummy();
 		}
@@ -3655,10 +3655,10 @@ class PlayState extends MusicBeatState
 
 		if (ClientPrefs.data.randomEngineNames) {
 		    if (dancingLeft) {
-				randomName = FlxG.random.int(0, 26); // 25
+				randomName = (randomName + 1) % 26; // 25
 				engineNamesList();
 			} else {
-				randomName = FlxG.random.int(0, 26); // 25
+				randomName = (randomName + 1) % 26; // 25
 				engineNamesList();
 			}
 		}
