@@ -1238,7 +1238,7 @@ class FunkinLua {
 				return;
 			}
 
-    		var poo:ModchartVideo = game.modchartVideos.get(tag);
+    		var poo:FlxSprite = game.modchartVideos.get(tag); // ModchartVideo
 			if(destroy) {
 				poo.kill();
 			}
