@@ -2678,7 +2678,7 @@ class PlayState extends MusicBeatState
 					if (char != null)
 					{
 						var charColor = FlxColor.fromRGB(char.healthColorArray[0], char.healthColorArray[1], char.healthColorArray[2]);
-						if () {
+						if (!stageData.hide_girlfriend) {
 							if (charColor == FlxColor.BLACK && (!SONG.notes[curSection].mustHitSection || SONG.notes[curSection].gfSection || SONG.notes[curSection].mustHitSection)) {
 								lyricsText.color = FlxColor.WHITE;
 							} else {
