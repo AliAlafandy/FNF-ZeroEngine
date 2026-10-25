@@ -669,13 +669,13 @@ class PlayState extends MusicBeatState
 		lyricsBG = new FlxSprite();
 		lyricsBG.makeGraphic(1, 1, FlxColor.BLACK);
 		lyricsBG.alpha = 0.6;
-		lyricsBG.cameras = [camHUD];
+		// lyricsBG.cameras = [camHUD];
 		lyricsBG.visible = false;
 		uiGroup.add(lyricsBG);
 
 		lyricsText = new FlxText(0, 0, 0, "");
 		lyricsText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER);
-		lyricsText.cameras = [camHUD];
+		// lyricsText.cameras = [camHUD];
 		lyricsText.visible = false;
 		uiGroup.add(lyricsText);
 
@@ -847,7 +847,7 @@ class PlayState extends MusicBeatState
 	function engineNamesList()
 	{
 	    switch (randomName)
-	    {
+		{
 	        case 0: engineName = 'A Slice';
 	        case 1: engineName = 'Alafandy Engine';
 	        case 2: engineName = 'Alsuh Engine';
@@ -945,19 +945,33 @@ class PlayState extends MusicBeatState
 		var gfColor = FlxColor.fromRGB(gf.healthColorArray[0], gf.healthColorArray[1], gf.healthColorArray[2]);
 		var bfColor = FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]);
 
-		if ((dadColor == FlxColor.BLACK && !SONG.notes[curSection].mustHitSection)
-			|| (gfColor == FlxColor.BLACK && SONG.notes[curSection].gfSection && !stageData.hide_girlfriend)
-			|| (bfColor == FlxColor.BLACK && SONG.notes[curSection].mustHitSection)) {
-			lyricsText.color = FlxColor.WHITE;
+		if (!stageData.hide_girlfriend) {
+			if ((dadColor == FlxColor.BLACK && !SONG.notes[curSection].mustHitSection)
+				|| (gfColor == FlxColor.BLACK && SONG.notes[curSection].gfSection)
+				|| (bfColor == FlxColor.BLACK && SONG.notes[curSection].mustHitSection)) {
+				lyricsText.color = FlxColor.WHITE;
+			} else {
+				if (!SONG.notes[curSection].mustHitSection) {
+					lyricsText.color = dadColor;
+				}
+				if (SONG.notes[curSection].gfSection) {
+					lyricsText.color = gfColor;
+				}
+				if (SONG.notes[curSection].mustHitSection) {
+					lyricsText.color = bfColor;
+				}
+			}
 		} else {
-			if (!SONG.notes[curSection].mustHitSection) {
-				lyricsText.color = dadColor;
-			}
-			if (SONG.notes[curSection].gfSection && !stageData.hide_girlfriend) {
-				lyricsText.color = gfColor;
-			}
-			if (SONG.notes[curSection].mustHitSection) {
-				lyricsText.color = bfColor;
+			if ((dadColor == FlxColor.BLACK && !SONG.notes[curSection].mustHitSection)
+				|| (bfColor == FlxColor.BLACK && SONG.notes[curSection].mustHitSection)) {
+				lyricsText.color = FlxColor.WHITE;
+			} else {
+				if (!SONG.notes[curSection].mustHitSection) {
+					lyricsText.color = dadColor;
+				}
+				if (SONG.notes[curSection].mustHitSection) {
+					lyricsText.color = bfColor;
+				}
 			}
 		}
 	}
@@ -2620,9 +2634,16 @@ class PlayState extends MusicBeatState
 						{
 							lyricsText.color = CoolUtil.colorFromString(value2);
 						} else {
-							if(!SONG.notes[curSection].mustHitSection || SONG.notes[curSection].gfSection || SONG.notes[curSection].mustHitSection)
-							{
-								reloadSubTitlesColor();
+							if (!stageData.hide_girlfriend) {
+								if(!SONG.notes[curSection].mustHitSection || SONG.notes[curSection].gfSection || SONG.notes[curSection].mustHitSection)
+								{
+									reloadSubTitlesColor();
+								}
+							} else {
+								if(!SONG.notes[curSection].mustHitSection || SONG.notes[curSection].mustHitSection)
+								{
+									reloadSubTitlesColor();
+								}
 							}
 						}
 					} else {
@@ -2640,22 +2661,32 @@ class PlayState extends MusicBeatState
 							char = boyfriend;
 						case 'dad' | '1':
 							char = dad;
-						case 'gf' | 'girlfriend' | '2':
-							char = gf;
+						if (!stageData.hide_girlfriend) {
+							case 'gf' | 'girlfriend' | '2':
+								char = gf;
+						}
 						// default: // nothing
 					}
 					if (char != null)
 					{
 						var charColor = FlxColor.fromRGB(char.healthColorArray[0], char.healthColorArray[1], char.healthColorArray[2]);
-						if (charColor == FlxColor.BLACK && (!SONG.notes[curSection].mustHitSection || SONG.notes[curSection].gfSection || SONG.notes[curSection].mustHitSection)) {
-							lyricsText.color = FlxColor.WHITE;
+						if () {
+							if (charColor == FlxColor.BLACK && (!SONG.notes[curSection].mustHitSection || SONG.notes[curSection].gfSection || SONG.notes[curSection].mustHitSection)) {
+								lyricsText.color = FlxColor.WHITE;
+							} else {
+								lyricsText.color = charColor;
+							}
 						} else {
-							lyricsText.color = charColor;
+							if (charColor == FlxColor.BLACK && (!SONG.notes[curSection].mustHitSection || SONG.notes[curSection].mustHitSection)) {
+								lyricsText.color = FlxColor.WHITE;
+							} else {
+								lyricsText.color = charColor;
+							}
 						}
 					}
 
 					lyricsText.screenCenter(X);
-					lyricsText.y = FlxG.height - 180;
+					lyricsText.y = FlxG.height - 150; // 180
 
 					lyricsBG.makeGraphic(Std.int(lyricsText.width + 16), Std.int(lyricsText.height + 8), FlxColor.BLACK);
 					lyricsBG.alpha = 0.6;
@@ -3614,13 +3645,13 @@ class PlayState extends MusicBeatState
 
 		characterBopper(curBeat);
 
-		if (startedCountdown && ClientPrefs.data.randomEngineNames) {
+		if (ClientPrefs.data.randomEngineNames) {
 		    if (dancingLeft) {
 				randomName = FlxG.random.int(0, 26); // 25
-				// engineNamesList();
+				engineNamesList();
 			} else {
 				randomName = FlxG.random.int(0, 26); // 25
-				// engineNamesList();
+				engineNamesList();
 			}
 		}
 
