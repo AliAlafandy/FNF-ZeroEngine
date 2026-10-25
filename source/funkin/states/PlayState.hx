@@ -2656,16 +2656,24 @@ class PlayState extends MusicBeatState
 					}
 
 					var char:Character = null;
-					switch(value2.toLowerCase().trim()) {
-						case 'bf' | 'boyfriend' | '0':
-							char = boyfriend;
-						case 'dad' | '1':
-							char = dad;
-						if (!stageData.hide_girlfriend) {
+					if (!stageData.hide_girlfriend) {
+						switch(value2.toLowerCase().trim()) {
+							case 'bf' | 'boyfriend' | '0':
+								char = boyfriend;
+							case 'dad' | '1':
+								char = dad;
 							case 'gf' | 'girlfriend' | '2':
 								char = gf;
+							// default: // nothing
 						}
-						// default: // nothing
+					} else {
+						switch(value2.toLowerCase().trim()) {
+							case 'bf' | 'boyfriend' | '0':
+								char = boyfriend;
+							case 'dad' | '1':
+								char = dad;
+							// default: // nothing
+						}
 					}
 					if (char != null)
 					{
