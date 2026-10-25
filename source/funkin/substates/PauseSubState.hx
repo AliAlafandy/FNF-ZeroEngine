@@ -47,6 +47,17 @@ class PauseSubState extends MusicBeatSubstate
 
 	override function create()
 	{
+		#if VIDEOS_ALLOWED
+		if (PlayState.instance != null)
+		{
+			for (video in PlayState.instance.modchartVideos)
+			{
+				if (video != null)
+					video.pause();
+			}
+		}
+		#end
+
 		if(Difficulty.list.length < 2) menuItemsOG.remove('Change Difficulty'); //No need to change difficulty if there is only one!
 
 		if(PlayState.chartingMode)
@@ -404,8 +415,18 @@ class PauseSubState extends MusicBeatSubstate
 
 	override function destroy()
 	{
-		pauseMusic.destroy();
+		#if VIDEOS_ALLOWED
+		if (PlayState.instance != null)
+		{
+			for (video in PlayState.instance.modchartVideos)
+			{
+				if (video != null)
+					video.resume();
+			}
+		}
+		#end
 
+		pauseMusic.destroy();
 		super.destroy();
 	}
 
