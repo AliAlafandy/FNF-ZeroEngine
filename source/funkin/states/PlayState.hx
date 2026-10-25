@@ -2694,7 +2694,7 @@ class PlayState extends MusicBeatState
 					}
 
 					lyricsText.screenCenter(X);
-					lyricsText.y = FlxG.height - 150; // 180
+					lyricsText.y = FlxG.height - 210; // 180
 
 					lyricsBG.makeGraphic(Std.int(lyricsText.width + 16), Std.int(lyricsText.height + 8), FlxColor.BLACK);
 					lyricsBG.alpha = 0.6;
