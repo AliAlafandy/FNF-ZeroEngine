@@ -1,13 +1,14 @@
 package funkin.data.scripts;
 
 #if VIDEOS_ALLOWED
-// import hxvlc.flixel.FlxVideoSprite;
+import hxvlc.flixel.FlxVideoSprite;
 
-class ModchartVideo extends FlxSprite
+class ModchartVideo extends FlxVideoSprite
 {
 	public function new(?x:Float = 0, ?y:Float = 0)
 	{
 		super(x, y);
+		antialiasing = ClientPrefs.data.antialiasing;
 	}
 }
 #end
