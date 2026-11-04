@@ -228,7 +228,7 @@ class Main extends Sprite
 		waterMark.addChild(new Bitmap(bitmapData));
 		waterMark.alpha = 0.4;
 		updateWaterMarkPosition();
-		addChild(waterMark);
+		Lib.current.stage.addChild(waterMark);
 	}
 
 	static function updateWaterMarkPosition():Void
