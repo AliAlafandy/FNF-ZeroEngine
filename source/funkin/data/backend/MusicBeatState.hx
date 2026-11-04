@@ -50,6 +50,13 @@ class MusicBeatState extends FlxUIState
 
 	public function addMobileControls(defaultDrawTarget:Bool = false):Void
 	{
+		// Official mode uses the gameplay strumlines as touch controls, not TouchPad.
+		if (MobileData.mode == 4)
+		{
+			removeMobileControls();
+			return;
+		}
+
 		var extraMode = MobileData.extraActions.get(ClientPrefs.data.extraButtons);
 
 		switch (MobileData.mode)
