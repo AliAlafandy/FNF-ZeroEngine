@@ -3352,14 +3352,21 @@ class PlayState extends MusicBeatState
 		var holdArray:Array<Bool> = [];
 		var pressArray:Array<Bool> = [];
 		var releaseArray:Array<Bool> = [];
+		var laneIndex:Int = 0;
 		for (key in keysArray)
 		{
-			holdArray.push(controls.pressed(key));
-			/*if(controls.controllerMode)
-			{*/
-				pressArray.push(controls.justPressed(key));
-				releaseArray.push(controls.justReleased(key));
-			//}
+			var isHeld:Bool = controls.pressed(key);
+			#if mobile
+			// Official mobile strumline touches are tracked separately from
+			// keyboard/controller inputs. Include them so sustain pieces and
+			// hold ends continue registering while the finger stays down.
+			if (MobileData.mode == 4 && laneIndex < mobileStrumTouchState.length)
+				isHeld = isHeld || mobileStrumTouchState[laneIndex];
+			#end
+			holdArray.push(isHeld);
+			pressArray.push(controls.justPressed(key));
+			releaseArray.push(controls.justReleased(key));
+			laneIndex++;
 		}
 
 		// TO DO: Find a better way to handle controller inputs, this should work for now
