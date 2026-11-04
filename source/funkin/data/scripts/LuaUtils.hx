@@ -354,26 +354,25 @@ class LuaUtils
 
 	public static function resetSpriteTag(tag:String) {
 		#if LUA_ALLOWED
-		if(!PlayState.instance.modchartSprites.exists(tag)) {
+		if (PlayState.instance == null)
 			return;
-		}
 
-		var target:ModchartSprite = PlayState.instance.modchartSprites.get(tag);
-		target.kill();
-		PlayState.instance.remove(target, true);
-		target.destroy();
-		PlayState.instance.modchartSprites.remove(tag);
+		if (PlayState.instance.modchartSprites.exists(tag)) {
+			var target:ModchartSprite = PlayState.instance.modchartSprites.get(tag);
+			target.kill();
+			PlayState.instance.remove(target, true);
+			target.destroy();
+			PlayState.instance.modchartSprites.remove(tag);
+		}
 
 		#if VIDEOS_ALLOWED
-		if(!PlayState.instance.modchartVideos.exists(tag)) {
-			return;
+		if (PlayState.instance.modchartVideos.exists(tag)) {
+			var video:ModchartVideo = PlayState.instance.modchartVideos.get(tag);
+			video.kill();
+			PlayState.instance.remove(video, true);
+			video.destroy();
+			PlayState.instance.modchartVideos.remove(tag);
 		}
-
-		var getTar:ModchartVideo = PlayState.instance.modchartVideos.get(tag);
-		getTar.kill();
-		PlayState.instance.remove(getTar, true);
-		getTar.destroy();
-		PlayState.instance.modchartVideos.remove(tag);
 		#end
 		#end
 	}
