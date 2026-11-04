@@ -1767,10 +1767,12 @@ class PlayState extends MusicBeatState
 						{
 							if (sustainNote.mustPress)
 							{
-								var laneWidth:Float = Note.swagWidth;
-								sustainNote.x = daNoteData < 2
-									? 12 + laneWidth * daNoteData
-									: FlxG.width - 12 - laneWidth * (4 - daNoteData);
+								var mobileArrowWidth:Float = Note.swagWidth * (1.95 / (16 / 9));
+								var mobileSpacing:Float = Note.swagWidth * (2.8 / (16 / 9));
+								var mobileGroupWidth:Float = mobileSpacing * 3 + mobileArrowWidth;
+								sustainNote.x = (FlxG.width - mobileGroupWidth) * 0.5
+									+ mobileSpacing * daNoteData
+									+ (mobileArrowWidth - sustainNote.width) * 0.5;
 							}
 							else sustainNote.visible = false;
 						}
@@ -1792,10 +1794,12 @@ class PlayState extends MusicBeatState
 				{
 					if (swagNote.mustPress)
 					{
-						var laneWidth:Float = Note.swagWidth;
-						swagNote.x = daNoteData < 2
-							? 12 + laneWidth * daNoteData
-							: FlxG.width - 12 - laneWidth * (4 - daNoteData);
+						var mobileArrowWidth:Float = Note.swagWidth * (1.95 / (16 / 9));
+						var mobileSpacing:Float = Note.swagWidth * (2.8 / (16 / 9));
+						var mobileGroupWidth:Float = mobileSpacing * 3 + mobileArrowWidth;
+						swagNote.x = (FlxG.width - mobileGroupWidth) * 0.5
+							+ mobileSpacing * daNoteData
+							+ (mobileArrowWidth - swagNote.width) * 0.5;
 					}
 					else swagNote.visible = false;
 				}
@@ -1906,8 +1910,10 @@ class PlayState extends MusicBeatState
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 
 		#if mobile
-		// Mode 4 uses the regular receptor size, split into two pairs:
-		// Left + Down on the left edge, Up + Right on the right edge.
+		// Match the official FNF mobile layout: four enlarged player
+		// receptors grouped together at the bottom-center of the screen.
+		var mobilePlayerScale:Float = 1.95 / (16 / 9);
+		var mobilePlayerSpacing:Float = Note.swagWidth * (2.8 / (16 / 9));
 		#end
 
 		for (i in 0...4)
@@ -1925,7 +1931,8 @@ class PlayState extends MusicBeatState
 			#if mobile
 			if (useMobileLayout)
 			{
-				// Opponent receptors are not used in this mobile layout.
+				// Opponent receptors stay available for their note animations,
+				// but are not drawn in the mobile playfield.
 				targetAlpha = player == 1 ? 1 : 0;
 			}
 			#end
@@ -1961,11 +1968,10 @@ class PlayState extends MusicBeatState
 			{
 				if (player == 1)
 				{
-					var edgeMargin:Float = 12;
-					var arrowWidth:Float = babyArrow.width;
-					babyArrow.x = i < 2
-						? edgeMargin + arrowWidth * i
-						: FlxG.width - edgeMargin - arrowWidth * (4 - i);
+					babyArrow.scale.set(mobilePlayerScale, mobilePlayerScale);
+					babyArrow.updateHitbox();
+					babyArrow.x = (FlxG.width - (mobilePlayerSpacing * 3 + babyArrow.width)) * 0.5
+						+ mobilePlayerSpacing * i;
 					babyArrow.y = FlxG.height - babyArrow.height - 24;
 				}
 				else
