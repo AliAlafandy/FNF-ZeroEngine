@@ -3632,8 +3632,8 @@ class PlayState extends MusicBeatState
 		FunkinLua.customFunctions.clear();
 		#end
 
-		// Dispose Lua-created videos before this PlayState is replaced.
-		// Otherwise their VLC playback can continue over the restarted song.
+		// Stop and dispose Lua-created videos whenever gameplay is destroyed:
+		// restart, exit to menu, or any other state transition.
 		#if LUA_ALLOWED
 		#if VIDEOS_ALLOWED
 		if (modchartVideos != null)
@@ -3643,7 +3643,7 @@ class PlayState extends MusicBeatState
 				var video:ModchartVideo = modchartVideos.get(tag);
 				if (video != null)
 				{
-					video.pause();
+					video.stop();
 					remove(video, true);
 					video.destroy();
 				}
