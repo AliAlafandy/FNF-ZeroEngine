@@ -354,30 +354,31 @@ class LuaUtils
 
 	public static function resetSpriteTag(tag:String) {
 		#if LUA_ALLOWED
-		if(!PlayState.instance.modchartSprites.exists(tag)) {
-			return;
-		}
+		var state = PlayState.instance;
+		if (state == null) return;
 
-		var target:ModchartSprite = PlayState.instance.modchartSprites.get(tag);
-		target.kill();
-		PlayState.instance.remove(target, true);
-		target.destroy();
-		PlayState.instance.modchartSprites.remove(tag);
+		if (state.modchartSprites.exists(tag))
+		{
+			var sprite:ModchartSprite = state.modchartSprites.get(tag);
+			sprite.kill();
+			state.remove(sprite, true);
+			sprite.destroy();
+			state.modchartSprites.remove(tag);
+		}
 
 		#if VIDEOS_ALLOWED
-		if(!PlayState.instance.modchartVideos.exists(tag)) {
-			return;
+		if (state.modchartVideos.exists(tag))
+		{
+			var video:ModchartVideo = state.modchartVideos.get(tag);
+			video.kill();
+			video.pause();
+			state.remove(video, true);
+			state.modchartVideos.remove(tag);
+			video.destroy();
 		}
-
-		var getTar:ModchartVideo = PlayState.instance.modchartVideos.get(tag);
-		getTar.kill();
-		PlayState.instance.remove(getTar, true);
-		getTar.destroy();
-		PlayState.instance.modchartVideos.remove(tag);
 		#end
 		#end
 	}
-
 	public static function cancelTween(tag:String) {
 		#if LUA_ALLOWED
 		if(PlayState.instance.modchartTweens.exists(tag)) {
