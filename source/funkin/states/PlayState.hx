@@ -2790,11 +2790,12 @@ class PlayState extends MusicBeatState
 	public function endSong()
 	{
 		#if mobile
-		mobileControls.instance.visible =
+		if (mobileControls != null && mobileControls.instance != null)
+			mobileControls.instance.visible = false;
 		#if !android
-		touchPad.visible =
+		if (touchPad != null)
+			touchPad.visible = false;
 		#end
-		false;
 		#end
 		
 		//Should kill you if you tried to cheat
