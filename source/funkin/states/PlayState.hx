@@ -1762,6 +1762,20 @@ class PlayState extends MusicBeatState
 						}
 
 						//if (useVSliceHUD) sustainNote.flipY = gottaHitNote;
+						#if mobile
+						if (useVSliceHUD)
+						{
+							if (sustainNote.mustPress)
+							{
+								var laneWidth:Float = Note.swagWidth;
+								sustainNote.x = daNoteData < 2
+									? 12 + laneWidth * daNoteData
+									: FlxG.width - 12 - laneWidth * (4 - daNoteData);
+							}
+							else sustainNote.visible = false;
+						}
+						else
+						#end
 						if (sustainNote.mustPress) sustainNote.x += FlxG.width / 2; // general offset
 						else if(ClientPrefs.data.middleScroll && !useVSliceHUD)
 						{
@@ -1773,6 +1787,20 @@ class PlayState extends MusicBeatState
 				}
 
 				//if (useVSliceHUD) swagNote.flipY = gottaHitNote;
+				#if mobile
+				if (useVSliceHUD)
+				{
+					if (swagNote.mustPress)
+					{
+						var laneWidth:Float = Note.swagWidth;
+						swagNote.x = daNoteData < 2
+							? 12 + laneWidth * daNoteData
+							: FlxG.width - 12 - laneWidth * (4 - daNoteData);
+					}
+					else swagNote.visible = false;
+				}
+				else
+				#end
 				if (swagNote.mustPress)
 				{
 					swagNote.x += FlxG.width / 2; // general offset
@@ -1878,10 +1906,8 @@ class PlayState extends MusicBeatState
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 
 		#if mobile
-		var amplification:Float = (FlxG.width / FlxG.height) / (16 / 9);
-		var playerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * amplification;
-		var playerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * amplification);
-		var opponentScale:Float = 0.4 * amplification;
+		// Mode 4 uses the regular receptor size, split into two pairs:
+		// Left + Down on the left edge, Up + Right on the right edge.
 		#end
 
 		for (i in 0...4)
@@ -1899,10 +1925,8 @@ class PlayState extends MusicBeatState
 			#if mobile
 			if (useMobileLayout)
 			{
-				var arrowScale:Float = player == 1 ? playerScale : opponentScale;
-				babyArrow.scale.set(arrowScale, arrowScale);
-				babyArrow.updateHitbox();
-				targetAlpha = 1;
+				// Opponent receptors are not used in this mobile layout.
+				targetAlpha = player == 1 ? 1 : 0;
 			}
 			#end
 
@@ -1935,12 +1959,19 @@ class PlayState extends MusicBeatState
 			#if mobile
 			if (useMobileLayout)
 			{
-				if (player == 1) {
-					babyArrow.x = (FlxG.width - (playerSpacing * 3 + babyArrow.width)) * 0.5 + playerSpacing * i;
-					babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
-				} else {
-					babyArrow.x = 18 + (Note.swagWidth * opponentScale) * i;
-					babyArrow.y = FlxG.height * 0.035;
+				if (player == 1)
+				{
+					var edgeMargin:Float = 12;
+					var arrowWidth:Float = babyArrow.width;
+					babyArrow.x = i < 2
+						? edgeMargin + arrowWidth * i
+						: FlxG.width - edgeMargin - arrowWidth * (4 - i);
+					babyArrow.y = FlxG.height - babyArrow.height - 24;
+				}
+				else
+				{
+					babyArrow.visible = false;
+					babyArrow.alpha = 0;
 				}
 			}
 			#end
