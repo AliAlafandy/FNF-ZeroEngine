@@ -539,18 +539,21 @@ class EditorPlayState extends MusicBeatSubstate
 	private function generateStaticArrows(player:Int):Void
 	{
 		#if mobile
-		var useMobileLayout:Bool = MobileData.mode == 4;
+		var useMobileLayout:Bool = (MobileData.mode == 4);
 		#else
 		var useMobileLayout:Bool = false;
 		#end
+
 		var strumLineX:Float = useMobileLayout ? 0 : (ClientPrefs.data.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X);
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
+
 		#if mobile
 		var amplification:Float = (FlxG.width / FlxG.height) / (16 / 9);
 		var playerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * amplification;
 		var playerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * amplification);
 		var opponentScale:Float = 0.4 * amplification;
 		#end
+
 		for (i in 0...4)
 		{
 			var targetAlpha:Float = 1;
@@ -562,6 +565,7 @@ class EditorPlayState extends MusicBeatSubstate
 
 			var babyArrow:StrumNote = new StrumNote(strumLineX, strumLineY, i, player);
 			babyArrow.downScroll = useMobileLayout ? player == 1 : ClientPrefs.data.downScroll;
+
 			#if mobile
 			if (useMobileLayout)
 			{
@@ -571,6 +575,7 @@ class EditorPlayState extends MusicBeatSubstate
 				targetAlpha = 1;
 			}
 			#end
+
 			babyArrow.alpha = targetAlpha;
 
 			if (player == 1)
@@ -587,16 +592,13 @@ class EditorPlayState extends MusicBeatSubstate
 
 			strumLineNotes.add(babyArrow);
 			babyArrow.postAddedToGroup();
+
 			#if mobile
-			if (useMobileLayout)
-			{
-				if (player == 1)
-				{
+			if (useMobileLayout) {
+				if (player == 1) {
 					babyArrow.x = (FlxG.width - (playerSpacing * 3 + babyArrow.width)) * 0.5 + playerSpacing * i;
 					babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
-				}
-				else
-				{
+				} else {
 					babyArrow.x = 18 + (Note.swagWidth * opponentScale) * i;
 					babyArrow.y = FlxG.height * 0.035;
 				}
