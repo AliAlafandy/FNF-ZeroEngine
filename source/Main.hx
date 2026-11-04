@@ -236,8 +236,31 @@ class Main extends Sprite
 		if (waterMark == null || Lib.current.stage == null)
 			return;
 
-		waterMark.x = Lib.current.stage.stageWidth - 10 - waterMark.width;
-		waterMark.y = Lib.current.stage.stageHeight - 10 - waterMark.height;
+		var stageWidth:Float = Lib.current.stage.stageWidth;
+		var stageHeight:Float = Lib.current.stage.stageHeight;
+
+		// With Wide Screen Mode disabled, Flixel keeps the game viewport
+		// centered and the unused space becomes the side letterbox bars.
+		// Put the watermark inside a side bar instead of over the game.
+		if (!ClientPrefs.data.wideScreen && FlxG.game != null)
+		{
+			var gameLeft:Float = FlxG.game.x;
+			var gameRight:Float = gameLeft + FlxG.game.width;
+			var leftBarWidth:Float = gameLeft;
+			var rightBarWidth:Float = stageWidth - gameRight;
+			var margin:Float = 10;
+
+			if (rightBarWidth >= waterMark.width + margin * 2)
+				waterMark.x = gameRight + (rightBarWidth - waterMark.width) * 0.5;
+			else if (leftBarWidth >= waterMark.width + margin * 2)
+				waterMark.x = (leftBarWidth - waterMark.width) * 0.5;
+			else
+				waterMark.x = stageWidth - margin - waterMark.width;
+		}
+		else
+			waterMark.x = stageWidth - 10 - waterMark.width;
+
+		waterMark.y = stageHeight - 10 - waterMark.height;
 	}
 	#end
 
