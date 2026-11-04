@@ -3,6 +3,7 @@ package funkin.states.editors;
 import funkin.data.backend.Song;
 import funkin.data.backend.Section;
 import funkin.data.backend.Rating;
+import mobile.data.backend.MobileData;
 
 import funkin.data.objects.Note;
 import funkin.data.objects.NoteSplash;
@@ -13,6 +14,7 @@ import flixel.addons.display.FlxGridOverlay;
 import flixel.util.FlxSort;
 import flixel.util.FlxStringUtil;
 import flixel.animation.FlxAnimationController;
+import flixel.math.FlxPoint;
 import flixel.input.keyboard.FlxKey;
 import openfl.events.KeyboardEvent;
 
@@ -52,6 +54,10 @@ class EditorPlayState extends MusicBeatSubstate
 		'note_up',
 		'note_right'
 	];
+
+	#if mobile
+	private var mobileStrumTouchState:Array<Bool> = [false, false, false, false];
+	#end
 	
 	var songHits:Int = 0;
 	var songMisses:Int = 0;
@@ -186,10 +192,18 @@ class EditorPlayState extends MusicBeatSubstate
 		#end
 
 		#if mobile
-		addMobileControls();
-		mobileControls.instance.visible = true;
-		mobileControls.onButtonDown.add(onButtonPress);
-		mobileControls.onButtonUp.add(onButtonRelease);
+		if (MobileData.mode != 4)
+		{
+			addMobileControls();
+			if (mobileControls != null && mobileControls.instance != null)
+			{
+				mobileControls.instance.visible = true;
+				mobileControls.onButtonDown.add(onButtonPress);
+				mobileControls.onButtonUp.add(onButtonRelease);
+			}
+		}
+		else
+			removeMobileControls();
 		#end
 		
 		generateSong(PlayState.SONG.song);
@@ -216,7 +230,8 @@ class EditorPlayState extends MusicBeatSubstate
 			#end
 			|| controls.BACK || FlxG.keys.justPressed.ESCAPE)
 		{
-			mobileControls.instance.visible = false;
+			if (mobileControls != null && mobileControls.instance != null)
+				mobileControls.instance.visible = false;
 			endSong();
 			super.update(elapsed);
 			return;
@@ -228,6 +243,10 @@ class EditorPlayState extends MusicBeatSubstate
 			super.update(elapsed);
 			return;
 		}
+		#end
+
+		#if mobile
+		updateMobileStrums();
 		#end
 		
 		if (startingSong)
@@ -833,6 +852,50 @@ class EditorPlayState extends MusicBeatSubstate
 			spr.resetAnim = 0;
 		}
 	}
+
+	#if mobile
+	private function updateMobileStrums():Void
+	{
+		if (MobileData.mode != 4)
+		{
+			for (lane in 0...4)
+			{
+				if (mobileStrumTouchState[lane]) keyReleased(lane);
+				mobileStrumTouchState[lane] = false;
+			}
+			return;
+		}
+
+		var touched:Array<Bool> = [false, false, false, false];
+		for (touch in FlxG.touches.list)
+		{
+			if (!touch.pressed) continue;
+
+			var point:FlxPoint = touch.getScreenPosition(FlxG.camera, FlxPoint.get());
+			for (lane in 0...playerStrums.length)
+			{
+				var receptor:StrumNote = playerStrums.members[lane];
+				if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
+
+				var padX:Float = receptor.width * 0.15;
+				var padY:Float = receptor.height * 0.15;
+				if (point.x >= receptor.x - padX && point.x <= receptor.x + receptor.width + padX
+					&& point.y >= receptor.y - padY && point.y <= receptor.y + receptor.height + padY)
+					touched[lane] = true;
+			}
+			point.put();
+		}
+
+		for (lane in 0...4)
+		{
+			if (touched[lane] && !mobileStrumTouchState[lane])
+				keyPressed(lane);
+			else if (!touched[lane] && mobileStrumTouchState[lane])
+				keyReleased(lane);
+			mobileStrumTouchState[lane] = touched[lane];
+		}
+	}
+	#end
 
 	private function onButtonPress(button:TouchButton):Void
 	{
