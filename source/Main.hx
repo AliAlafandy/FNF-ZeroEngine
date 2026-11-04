@@ -228,9 +228,9 @@ class Main extends Sprite
 		waterMark.alpha = 0.6; // 0.4
 		updateWaterMarkPosition();
 		Lib.current.stage.addChild(waterMark);
-		/*if(waterMark != null) {
+		if(waterMark != null) {
 			waterMark.visible = ClientPrefs.data.waterMark;
-		}*/
+		}
 	}
 
 	static function updateWaterMarkPosition():Void
