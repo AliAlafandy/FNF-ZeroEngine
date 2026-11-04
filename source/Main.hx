@@ -202,8 +202,8 @@ class Main extends Sprite
 
 	public static function updateWaterMark():Void
 	{
-		/*if (waterMark != null && waterMark.parent != null) waterMark.parent.removeChild(waterMark);
-		waterMark = null;*/
+		if (waterMark != null && waterMark.parent != null) waterMark.parent.removeChild(waterMark);
+		waterMark = null;
 
 		if (!ClientPrefs.data.waterMark || Lib.current.stage == null) return;
 
@@ -228,9 +228,9 @@ class Main extends Sprite
 		waterMark.alpha = 0.6; // 0.4
 		updateWaterMarkPosition();
 		Lib.current.stage.addChild(waterMark);
-		if(waterMark != null) {
+		/*if(waterMark != null) {
 			waterMark.visible = ClientPrefs.data.waterMark;
-		}
+		}*/
 	}
 
 	static function updateWaterMarkPosition():Void
