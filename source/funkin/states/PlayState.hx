@@ -1862,55 +1862,76 @@ class PlayState extends MusicBeatState
 	private function generateStaticArrows(player:Int):Void
 	{
 		#if mobile
-		var useVSliceHUD:Bool = MobileData.mode == 4;
+		var useMobileLayout:Bool = MobileData.mode == 4;
 		#else
-		var useVSliceHUD:Bool = false;
+		var useMobileLayout:Bool = false;
 		#end
-		// Official layout keeps opponent receptors at the top and player receptors
-		// at the bottom, independent of the legacy scroll layout preferences.
-		var strumLineX:Float = useVSliceHUD ? STRUM_X : (ClientPrefs.data.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X);
-		var strumLineY:Float = useVSliceHUD ? (player == 1 ? FlxG.height * 0.80 : FlxG.height * 0.38)
-			: (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
+		var strumLineX:Float = useMobileLayout ? 0 : (ClientPrefs.data.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X);
+		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
+		#if mobile
+		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+		var playerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * amplification;
+		var playerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * amplification);
+		var opponentScale:Float = 0.4 * amplification;
+		#end
 		for (i in 0...4)
 		{
-			// FlxG.log.add(i);
 			var targetAlpha:Float = 1;
-			if (player < 1 && !useVSliceHUD)
+			if (player < 1 && !useMobileLayout)
 			{
 				if(!ClientPrefs.data.opponentStrums) targetAlpha = 0;
 				else if(ClientPrefs.data.middleScroll) targetAlpha = 0.35;
 			}
 
 			var babyArrow:StrumNote = new StrumNote(strumLineX, strumLineY, i, player);
-			babyArrow.downScroll = useVSliceHUD ? player == 1 : ClientPrefs.data.downScroll;
+			babyArrow.downScroll = useMobileLayout ? player == 1 : ClientPrefs.data.downScroll;
+			#if mobile
+			if (useMobileLayout)
+			{
+				var arrowScale:Float = player == 1 ? playerScale : opponentScale;
+				babyArrow.scale.set(arrowScale, arrowScale);
+				babyArrow.updateHitbox();
+				targetAlpha = 1;
+			}
+			#end
 			if (!isStoryMode && !skipArrowStartTween)
 			{
-				//babyArrow.y -= 10;
 				babyArrow.alpha = 0;
-				FlxTween.tween(babyArrow, {/*y: babyArrow.y + 10,*/ alpha: targetAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+				FlxTween.tween(babyArrow, {alpha: targetAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
 			}
-			else
-				babyArrow.alpha = targetAlpha;
+			else babyArrow.alpha = targetAlpha;
 
 			if (player == 1)
 				playerStrums.add(babyArrow);
 			else
 			{
-				if(ClientPrefs.data.middleScroll && !useVSliceHUD)
+				if(ClientPrefs.data.middleScroll && !useMobileLayout)
 				{
 					babyArrow.x += 310;
-					if(i > 1) { //Up and Right
-						babyArrow.x += FlxG.width / 2 + 25;
-					}
+					if(i > 1) babyArrow.x += FlxG.width / 2 + 25;
 				}
 				opponentStrums.add(babyArrow);
 			}
 
 			strumLineNotes.add(babyArrow);
 			babyArrow.postAddedToGroup();
+			#if mobile
+			if (useMobileLayout)
+			{
+				if (player == 1)
+				{
+					babyArrow.x = (FlxG.width - (playerSpacing * 3 + babyArrow.width)) * 0.5 + playerSpacing * i;
+					babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
+				}
+				else
+				{
+					babyArrow.x = 18 + (Note.swagWidth * opponentScale) * i;
+					babyArrow.y = FlxG.height * 0.035;
+				}
+			}
+			#end
 		}
 	}
-
 	override function openSubState(SubState:FlxSubState)
 	{
 		stagesFunc(function(stage:BaseStage) stage.openSubState(SubState));
