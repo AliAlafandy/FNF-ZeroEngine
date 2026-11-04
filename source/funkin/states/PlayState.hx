@@ -3291,9 +3291,9 @@ class PlayState extends MusicBeatState
 
 					// FNF Mobile uses four broad touch lanes instead of requiring
 					// the player to hit the small receptor graphic precisely.
-					var laneLeft:Float = lane == 0 ? 0 : (playerStrums.members[lane - 1].getMidpoint().x + receptor.getMidpoint().x) * 0.5;
+					var laneLeft:Float = lane == 0 ? 0 : ((playerStrums.members[lane - 1].x + playerStrums.members[lane - 1].width * 0.5) + (receptor.x + receptor.width * 0.5)) * 0.5;
 					var laneRight:Float = lane == playerStrums.length - 1 ? FlxG.width
-						: (receptor.getMidpoint().x + playerStrums.members[lane + 1].getMidpoint().x) * 0.5;
+						: ((receptor.x + receptor.width * 0.5) + (playerStrums.members[lane + 1].x + playerStrums.members[lane + 1].width * 0.5)) * 0.5;
 				if (touchPoint.x >= laneLeft && touchPoint.x < laneRight && touchPoint.y >= FlxG.height * 0.52)
 					touched[lane] = true;
 				}
