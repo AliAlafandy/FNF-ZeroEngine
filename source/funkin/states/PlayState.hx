@@ -3289,12 +3289,13 @@ class PlayState extends MusicBeatState
 					var receptor:StrumNote = playerStrums.members[lane];
 					if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
 
-					var padX:Float = receptor.width * 0.15;
-					var padY:Float = receptor.height * 0.15;
-					if (touchPoint.x >= receptor.x - padX && touchPoint.x <= receptor.x + receptor.width + padX
-						&& touchPoint.y >= receptor.y - padY && touchPoint.y <= receptor.y + receptor.height + padY) {
-						touched[lane] = true;
-					}
+					// FNF Mobile uses four broad touch lanes instead of requiring
+					// the player to hit the small receptor graphic precisely.
+					var laneLeft:Float = lane == 0 ? 0 : (playerStrums.members[lane - 1].getMidpoint().x + receptor.getMidpoint().x) * 0.5;
+					var laneRight:Float = lane == playerStrums.length - 1 ? FlxG.width
+						: (receptor.getMidpoint().x + playerStrums.members[lane + 1].getMidpoint().x) * 0.5;
+				if (touchPoint.x >= laneLeft && touchPoint.x < laneRight && touchPoint.y >= FlxG.height * 0.52)
+					touched[lane] = true;
 				}
 				touchPoint.put();
 			}
