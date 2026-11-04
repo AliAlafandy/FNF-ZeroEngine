@@ -1,5 +1,7 @@
 package mobile.options;
 
+import Main;
+
 import mobile.data.backend.MobileScaleMode;
 import mobile.data.backend.MobileData;
 
