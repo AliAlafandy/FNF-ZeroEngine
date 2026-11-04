@@ -108,13 +108,25 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			"If checked, it will add water mark like icon.",
 			'waterMark',
 			'bool');
+		option.onChange = () ->
+		{
+			#if mobile
+			Main.updateWaterMark();
+			#end
+		};
 		addOption(option);
 
-		var option:Option = new Option('Water Mark Style:',
+		option = new Option('Water Mark Style:',
 			"What should the Water Mark style?",
 			'watermarkStyle',
 			'string',
 			['Psych Engine', 'Mods Engine', 'Zero Engine']);
+		option.onChange = () ->
+		{
+			#if mobile
+			Main.updateWaterMark();
+			#end
+		};
 		addOption(option);
 
 		super();
