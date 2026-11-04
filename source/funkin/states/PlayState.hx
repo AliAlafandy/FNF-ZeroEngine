@@ -578,7 +578,7 @@ class PlayState extends MusicBeatState
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
 		moveCameraSection();
 
-		healthBar = new Bar(0, FlxG.height * (#if mobile (ClientPrefs.data.mobileHUD == 'V-Slice' || ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end ? 0.11 : 0.89), 'healthBar', function() return health, 0, 2);
+		healthBar = new Bar(0, FlxG.height * (#if mobile (ClientPrefs.data.mobileHUD == 'V-Slice' ? 0.10 : (ClientPrefs.data.downScroll ? 0.11 : 0.89)) #else (ClientPrefs.data.downScroll ? 0.11 : 0.89) #end), 'healthBar', function() return health, 0, 2);
 		healthBar.screenCenter(X);
 		healthBar.leftToRight = false;
 		healthBar.scrollFactor.set();
@@ -588,13 +588,13 @@ class PlayState extends MusicBeatState
 		uiGroup.add(healthBar);
 
 		iconP1 = new HealthIcon(boyfriend.healthIcon, true);
-		iconP1.y = healthBar.y - 75;
+		iconP1.y = #if mobile (ClientPrefs.data.mobileHUD == 'V-Slice' ? healthBar.y + 10 : healthBar.y - 75) #else healthBar.y - 75 #end;
 		iconP1.visible = !ClientPrefs.data.hideHud;
 		iconP1.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP1);
 
 		iconP2 = new HealthIcon(dad.healthIcon, false);
-		iconP2.y = healthBar.y - 75;
+		iconP2.y = #if mobile (ClientPrefs.data.mobileHUD == 'V-Slice' ? healthBar.y + 10 : healthBar.y - 75) #else healthBar.y - 75 #end;
 		iconP2.visible = !ClientPrefs.data.hideHud;
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP2);
@@ -1851,7 +1851,7 @@ class PlayState extends MusicBeatState
 		// V-Slice layout keeps opponent receptors at the top and player receptors
 		// at the bottom, independent of the legacy scroll layout preferences.
 		var strumLineX:Float = useVSliceHUD ? STRUM_X : (ClientPrefs.data.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X);
-		var strumLineY:Float = useVSliceHUD ? (player == 1 ? FlxG.height - 150 : 50)
+		var strumLineY:Float = useVSliceHUD ? (player == 1 ? FlxG.height * 0.80 : FlxG.height * 0.38)
 			: (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 		for (i in 0...4)
 		{
@@ -3273,6 +3273,9 @@ class PlayState extends MusicBeatState
 
 	private function onButtonPress(button:TouchButton):Void
 	{
+		#if mobile
+		if (ClientPrefs.data.mobileHUD == 'V-Slice') return;
+		#end
 		if (button.IDs.filter(id -> id.toString().startsWith("EXTRA")).length > 0)
 			return;
 
@@ -3284,6 +3287,9 @@ class PlayState extends MusicBeatState
 
 	private function onButtonRelease(button:TouchButton):Void
 	{
+		#if mobile
+		if (ClientPrefs.data.mobileHUD == 'V-Slice') return;
+		#end
 		if (button.IDs.filter(id -> id.toString().startsWith("EXTRA")).length > 0)
 			return;
 
