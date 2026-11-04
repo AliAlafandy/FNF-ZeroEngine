@@ -729,7 +729,7 @@ class PlayState extends MusicBeatState
 
 		#if mobile
 		addMobileControls();
-		mobileControls.instance.visible = true;
+		mobileControls.instance.visible = ClientPrefs.data.mobileHUD != 'V-Slice';
 		mobileControls.onButtonDown.add(onButtonPress);
 		mobileControls.onButtonUp.add(onButtonRelease);
 		#end
@@ -1824,20 +1824,28 @@ class PlayState extends MusicBeatState
 	public var skipArrowStartTween:Bool = false; //for lua
 	private function generateStaticArrows(player:Int):Void
 	{
-		var strumLineX:Float = ClientPrefs.data.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X;
-		var strumLineY:Float = ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50;
+		#if mobile
+		var useVSliceHUD:Bool = ClientPrefs.data.mobileHUD == 'V-Slice';
+		#else
+		var useVSliceHUD:Bool = false;
+		#end
+		// V-Slice layout keeps opponent receptors at the top and player receptors
+		// at the bottom, independent of the legacy scroll layout preferences.
+		var strumLineX:Float = useVSliceHUD ? STRUM_X : (ClientPrefs.data.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X);
+		var strumLineY:Float = useVSliceHUD ? (player == 1 ? FlxG.height - 150 : 50)
+			: (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 		for (i in 0...4)
 		{
 			// FlxG.log.add(i);
 			var targetAlpha:Float = 1;
-			if (player < 1)
+			if (player < 1 && !useVSliceHUD)
 			{
 				if(!ClientPrefs.data.opponentStrums) targetAlpha = 0;
 				else if(ClientPrefs.data.middleScroll) targetAlpha = 0.35;
 			}
 
 			var babyArrow:StrumNote = new StrumNote(strumLineX, strumLineY, i, player);
-			babyArrow.downScroll = ClientPrefs.data.downScroll;
+			babyArrow.downScroll = useVSliceHUD ? true : ClientPrefs.data.downScroll;
 			if (!isStoryMode && !skipArrowStartTween)
 			{
 				//babyArrow.y -= 10;
@@ -1851,7 +1859,7 @@ class PlayState extends MusicBeatState
 				playerStrums.add(babyArrow);
 			else
 			{
-				if(ClientPrefs.data.middleScroll)
+				if(ClientPrefs.data.middleScroll && !useVSliceHUD)
 				{
 					babyArrow.x += 310;
 					if(i > 1) { //Up and Right
@@ -3199,6 +3207,17 @@ class PlayState extends MusicBeatState
 
 	private function updateMobileStrums():Void
 	{
+		// The receptor touch input belongs only to V-Slice mode. The other
+		// mobile layouts continue to use their original button controls.
+		if (ClientPrefs.data.mobileHUD != 'V-Slice')
+		{
+			for (lane in 0...4)
+			{
+				if (mobileStrumTouchState[lane]) keyReleased(lane);
+				mobileStrumTouchState[lane] = false;
+			}
+			return;
+		}
 		var touched:Array<Bool> = [false, false, false, false];
 
 		if (!cpuControlled && !paused && !inCutscene && generatedMusic && !endingSong && boyfriend != null && !boyfriend.stunned) {
