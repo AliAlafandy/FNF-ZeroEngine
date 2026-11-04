@@ -1869,7 +1869,7 @@ class PlayState extends MusicBeatState
 		var strumLineX:Float = useMobileLayout ? 0 : (ClientPrefs.data.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X);
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 		#if mobile
-		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+		var amplification:Float = (FlxG.width / FlxG.height) / (16 / 9);
 		var playerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * amplification;
 		var playerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * amplification);
 		var opponentScale:Float = 0.4 * amplification;
