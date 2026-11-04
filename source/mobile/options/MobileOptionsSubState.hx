@@ -1,6 +1,7 @@
 package mobile.options;
 
 import mobile.data.backend.MobileScaleMode;
+import mobile.data.backend.MobileData;
 
 import flixel.input.keyboard.FlxKey;
 
@@ -24,15 +25,6 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			storageTypes = storageTypes.concat(externalPaths); #end
 		title = 'Mobile Options';
 		rpcTitle = 'Mobile Options Menu'; // for Discord Rich Presence, fuck it
-
-		#if mobile
-		option = new Option('Control Style',
-			"Select the mobile gameplay layout.",
-			'controlStyle',
-			'string',
-			['Official', 'Hitbox', 'Virtual-Pad']);
-		addOption(option);
-		#end
 
 		option = new Option('Extra Controls',
 			"Select how many extra buttons you prefer to have?\nThey can be used for mechanics with LUA or HScript.",
@@ -73,7 +65,7 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		addOption(option);
 		#end
 
-		if (ClientPrefs.data.controlStyle == 'Hitbox')
+		if (MobileData.mode == 3)
 		{
 			option = new Option('Hitbox Design',
 				"Choose how your hitbox should look like.",
