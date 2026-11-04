@@ -1033,13 +1033,10 @@ class FunkinLua {
 			leSprite.active = true;
 			leSprite.bitmap.onEndReached.add(function() {
 				if (loop) {
-					// Keep the existing VLC repeat option for compatibility.
-					if (!leSprite.load(Paths.video(video), ['input-repeat=65545'])) {
-						game.remove(leSprite, true);
-						leSprite.kill();
-						leSprite.destroy();
-						if (game.modchartVideos.get(tag) == leSprite)
-							game.modchartVideos.remove(tag);
+					// Rewind the current media instead of loading it again.
+					if (leSprite.bitmap != null) {
+						leSprite.bitmap.position = 0.0;
+						leSprite.play();
 					}
 				} else {
 					game.remove(leSprite, true);
@@ -1228,35 +1225,29 @@ class FunkinLua {
 		});
 
 		Lua_helper.add_callback(lua, "removeLuaSprite", function(tag:String, destroy:Bool = true) {
-			if(!game.modchartSprites.exists(tag)) {
-				return;
-			}
+			if (game.modchartSprites.exists(tag)) {
+				var sprite:ModchartSprite = game.modchartSprites.get(tag);
+				if (destroy)
+					sprite.kill();
 
-			var pee:ModchartSprite = game.modchartSprites.get(tag);
-			if(destroy) {
-				pee.kill();
-			}
-
-			LuaUtils.getTargetInstance().remove(pee, true);
-			if(destroy) {
-				pee.destroy();
-				game.modchartSprites.remove(tag);
+				LuaUtils.getTargetInstance().remove(sprite, true);
+				if (destroy) {
+					sprite.destroy();
+					game.modchartSprites.remove(tag);
+				}
 			}
 
 			#if VIDEOS_ALLOWED
-			if (!game.modchartVideos.exists(tag)) {
-				return;
-			}
+			if (game.modchartVideos.exists(tag)) {
+				var video:ModchartVideo = game.modchartVideos.get(tag);
+				if (destroy)
+					video.kill();
 
-    		var poo:ModchartVideo = game.modchartVideos.get(tag);
-			if(destroy) {
-				poo.kill();
-			}
-
-			LuaUtils.getTargetInstance().remove(poo, true);
-			if(destroy) {
-				poo.destroy();
-				game.modchartVideos.remove(tag);
+				LuaUtils.getTargetInstance().remove(video, true);
+				if (destroy) {
+					video.destroy();
+					game.modchartVideos.remove(tag);
+				}
 			}
 			#end
 		});
