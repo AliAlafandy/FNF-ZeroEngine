@@ -607,29 +607,7 @@ class PlayState extends MusicBeatState
 		}
 		engineNamesList();
 
-		switch (ClientPrefs.data.enginemarkStyle) {
-			case 'Kade Engine':
-				if (ClientPrefs.data.randomEngineNames) {
-					if (ClientPrefs.data.botplayName == 'Song Name' && cpuControlled || ClientPrefs.data.timeBarType == 'Song Name') {
-						engineTxt.text = Difficulty.getString().toUpperCase() + " | " + engineName + " v" + MainMenuState.zeroEngineVersion;
-					} else {
-						engineTxt.text = SONG.song + " - " + Difficulty.getString().toUpperCase() + " | " + engineName + " v" + MainMenuState.zeroEngineVersion;
-					}
-				} else {
-					if (ClientPrefs.data.botplayName == 'Song Name' && cpuControlled || ClientPrefs.data.timeBarType == 'Song Name') {
-						engineTxt.text = Difficulty.getString().toUpperCase() + " | Zero Engine v" + MainMenuState.zeroEngineVersion;
-					} else {
-						engineTxt.text = SONG.song + " - " + Difficulty.getString().toUpperCase() + " | Zero Engine v" + MainMenuState.zeroEngineVersion;
-					}
-				}
-
-			case 'Zero Engine':
-				if (ClientPrefs.data.randomEngineNames) {
-					engineTxt.text = engineName + " v" + MainMenuState.zeroEngineVersion;
-				} else {
-					engineTxt.text = "Zero Engine v" + MainMenuState.zeroEngineVersion;
-				}
-		}
+		updateEngineMarkText();
 
 		if (ClientPrefs.data.typeRating == 'Base Game') {
 			// scoreTxt = new FlxText(0, healthBar.y + 40, FlxG.width, "", 20);
@@ -881,6 +859,25 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	function updateEngineMarkText():Void
+	{
+		if (engineTxt == null) return;
+
+		var name:String = ClientPrefs.data.randomEngineNames ? engineName : 'Zero Engine';
+		var version:String = name + " v" + MainMenuState.zeroEngineVersion;
+
+		switch (ClientPrefs.data.enginemarkStyle) {
+			case 'Kade Engine':
+				var songLabel:String = (ClientPrefs.data.botplayName == 'Song Name' && cpuControlled
+					|| ClientPrefs.data.timeBarType == 'Song Name')
+					? "" : SONG.song + " - ";
+				engineTxt.text = songLabel + Difficulty.getString().toUpperCase() + " | " + version;
+			case 'Zero Engine':
+				engineTxt.text = version;
+		}
+	}
+
+
 	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 	public function addTextToDebug(text:String, color:FlxColor) {
 		var newText:funkin.data.scripts.DebugLuaText = luaDebugGroup.recycle(funkin.data.scripts.DebugLuaText);
@@ -941,39 +938,26 @@ class PlayState extends MusicBeatState
 	}
 
 	public function reloadSubTitlesColor() {
-		var dadColor = FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]);
-		var gfColor = FlxColor.fromRGB(gf.healthColorArray[0], gf.healthColorArray[1], gf.healthColorArray[2]);
-		var bfColor = FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]);
+		var dadColor:FlxColor = FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]);
+		var bfColor:FlxColor = FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]);
+		var gfColor:Null<FlxColor> = null;
 
-		if (!stageData.hide_girlfriend) {
-			if ((dadColor == FlxColor.BLACK && !SONG.notes[curSection].mustHitSection)
-				|| (gfColor == FlxColor.BLACK && SONG.notes[curSection].gfSection)
-				|| (bfColor == FlxColor.BLACK && SONG.notes[curSection].mustHitSection)) {
-				lyricsText.color = FlxColor.WHITE;
-			} else {
-				if (!SONG.notes[curSection].mustHitSection) {
-					lyricsText.color = dadColor;
-				}
-				if (SONG.notes[curSection].gfSection) {
-					lyricsText.color = gfColor;
-				}
-				if (SONG.notes[curSection].mustHitSection) {
-					lyricsText.color = bfColor;
-				}
-			}
-		} else {
-			if ((dadColor == FlxColor.BLACK && !SONG.notes[curSection].mustHitSection)
-				|| (bfColor == FlxColor.BLACK && SONG.notes[curSection].mustHitSection)) {
-				lyricsText.color = FlxColor.WHITE;
-			} else {
-				if (!SONG.notes[curSection].mustHitSection) {
-					lyricsText.color = dadColor;
-				}
-				if (SONG.notes[curSection].mustHitSection) {
-					lyricsText.color = bfColor;
-				}
-			}
+		// A hidden girlfriend is not created, so never dereference gf when hide_girlfriend is true.
+		if (gf != null)
+			gfColor = FlxColor.fromRGB(gf.healthColorArray[0], gf.healthColorArray[1], gf.healthColorArray[2]);
+
+		var section:Section = (SONG != null && SONG.notes != null && curSection >= 0 && curSection < SONG.notes.length)
+			? SONG.notes[curSection] : null;
+
+		var speakerColor:FlxColor = dadColor;
+		if (section != null) {
+			if (section.gfSection && gfColor != null)
+				speakerColor = gfColor;
+			else if (section.mustHitSection)
+				speakerColor = bfColor;
 		}
+
+		lyricsText.color = (speakerColor == FlxColor.BLACK) ? FlxColor.WHITE : speakerColor;
 	}
 
 	public function addCharacterToList(newCharacter:String, type:Int) {
@@ -1999,6 +1983,10 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
+		#if mobile
+		updateMobileStrums();
+		#end
+
 		setOnScripts('curDecStep', curDecStep);
 		setOnScripts('curDecBeat', curDecBeat);
 
@@ -2655,42 +2643,32 @@ class PlayState extends MusicBeatState
 						}
 					}
 
+					var speaker:String = (value2 == null) ? "" : Std.string(value2).toLowerCase().trim();
+					var isSpeaker:Bool = (speaker == 'bf' || speaker == 'boyfriend' || speaker == '0'
+						|| speaker == 'dad' || speaker == '1' || speaker == 'gf' || speaker == 'girlfriend' || speaker == '2');
 					var char:Character = null;
-					if (!stageData.hide_girlfriend) {
-						switch(value2.toLowerCase().trim()) {
-							case 'bf' | 'boyfriend' | '0':
-								char = boyfriend;
-							case 'dad' | '1':
-								char = dad;
-							case 'gf' | 'girlfriend' | '2':
-								char = gf;
-							// default: // nothing
-						}
-					} else {
-						switch(value2.toLowerCase().trim()) {
-							case 'bf' | 'boyfriend' | '0':
-								char = boyfriend;
-							case 'dad' | '1':
-								char = dad;
-							// default: // nothing
-						}
+
+					switch(speaker) {
+						case 'bf' | 'boyfriend' | '0':
+							char = boyfriend;
+						case 'dad' | '1':
+							char = dad;
+						case 'gf' | 'girlfriend' | '2':
+							// hide_girlfriend means gf is deliberately not instantiated.
+							if (!stageData.hide_girlfriend) char = gf;
 					}
-					if (char != null)
-					{
-						var charColor = FlxColor.fromRGB(char.healthColorArray[0], char.healthColorArray[1], char.healthColorArray[2]);
-						if (!stageData.hide_girlfriend) {
-							if (charColor == FlxColor.BLACK && (!SONG.notes[curSection].mustHitSection || SONG.notes[curSection].gfSection || SONG.notes[curSection].mustHitSection)) {
-								lyricsText.color = FlxColor.WHITE;
-							} else {
-								lyricsText.color = charColor;
-							}
-						} else {
-							if (charColor == FlxColor.BLACK && (!SONG.notes[curSection].mustHitSection || SONG.notes[curSection].mustHitSection)) {
-								lyricsText.color = FlxColor.WHITE;
-							} else {
-								lyricsText.color = charColor;
-							}
-						}
+
+					// A speaker token is not a color. A non-speaker value may be an explicit color.
+					if (char != null) {
+						var charColor:FlxColor = FlxColor.fromRGB(char.healthColorArray[0], char.healthColorArray[1], char.healthColorArray[2]);
+						lyricsText.color = (charColor == FlxColor.BLACK) ? FlxColor.WHITE : charColor;
+					} else if (ClientPrefs.data.hudColor == 'On' && !isSpeaker) {
+						if (value2 != null && Std.string(value2).trim().length > 0)
+							lyricsText.color = CoolUtil.colorFromString(Std.string(value2));
+						else
+							reloadSubTitlesColor();
+					} else if (!isSpeaker && value2 != null && Std.string(value2).trim().length > 0) {
+						lyricsText.color = CoolUtil.colorFromString(Std.string(value2));
 					}
 
 					lyricsText.screenCenter(X);
@@ -3237,6 +3215,46 @@ class PlayState extends MusicBeatState
 		return -1;
 	}
 
+	#if mobile
+	/**
+	 * Let mobile players hit the actual player receptors, like V-Slice's
+	 * touch-enabled strumline. Each finger can hold a lane for sustain notes.
+	 */
+	private var mobileStrumTouchState:Array<Bool> = [false, false, false, false];
+
+	private function updateMobileStrums():Void
+	{
+		var touched:Array<Bool> = [false, false, false, false];
+
+		if (!cpuControlled && !paused && !inCutscene && generatedMusic && !endingSong && boyfriend != null && !boyfriend.stunned) {
+			for (touch in FlxG.touches.list) {
+				if (!touch.pressed) continue;
+
+				for (lane in 0...playerStrums.length) {
+					var receptor:StrumNote = playerStrums.members[lane];
+					if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
+
+					var padX:Float = receptor.width * 0.15;
+					var padY:Float = receptor.height * 0.15;
+					if (touch.screenX >= receptor.x - padX && touch.screenX <= receptor.x + receptor.width + padX
+						&& touch.screenY >= receptor.y - padY && touch.screenY <= receptor.y + receptor.height + padY) {
+						touched[lane] = true;
+					}
+				}
+			}
+		}
+
+		for (lane in 0...4) {
+			if (touched[lane] && !mobileStrumTouchState[lane])
+				keyPressed(lane);
+			else if (!touched[lane] && mobileStrumTouchState[lane])
+				keyReleased(lane);
+
+			mobileStrumTouchState[lane] = touched[lane];
+		}
+	}
+	#end
+
 	private function onButtonPress(button:TouchButton):Void
 	{
 		if (button.IDs.filter(id -> id.toString().startsWith("EXTRA")).length > 0)
@@ -3617,6 +3635,20 @@ class PlayState extends MusicBeatState
 		}
 
 		lastStepHit = curStep;
+
+		// Change the displayed engine identity every four steps (one beat).
+		if (ClientPrefs.data.randomEngineNames && curStep % 4 == 0) {
+			var previousName:Int = randomName;
+			if (curStep == 0 || previousName < 0 || previousName > 26)
+				randomName = FlxG.random.int(0, 26);
+			else {
+				randomName = FlxG.random.int(0, 25);
+				if (randomName >= previousName) randomName++;
+			}
+			engineNamesList();
+			updateEngineMarkText();
+		}
+
 		setOnScripts('curStep', curStep);
 		callOnScripts('onStepHit');
 	}
@@ -3652,16 +3684,6 @@ class PlayState extends MusicBeatState
 		iconP2.updateHitbox();
 
 		characterBopper(curBeat);
-
-		if (ClientPrefs.data.randomEngineNames) {
-		    if (dancingLeft) {
-				randomName = (randomName + 1) % 26; // 25
-				engineNamesList();
-			} else {
-				randomName = (randomName + 1) % 26; // 25
-				engineNamesList();
-			}
-		}
 
 		super.beatHit();
 		lastBeatHit = curBeat;
