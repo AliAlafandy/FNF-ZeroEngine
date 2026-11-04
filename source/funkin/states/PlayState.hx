@@ -513,7 +513,11 @@ class PlayState extends MusicBeatState
 		timeTxt.borderSize = 2;
 		timeTxt.visible = updateTime = showTime;
 		
-		if(ClientPrefs.data.downScroll) timeTxt.y = FlxG.height - 44;
+				#if mobile
+		if (ClientPrefs.data.mobileHUD != 'V-Slice' && ClientPrefs.data.downScroll) timeTxt.y = FlxG.height - 44;
+		#else
+		if (ClientPrefs.data.downScroll) timeTxt.y = FlxG.height - 44;
+		#end
 		if(ClientPrefs.data.timeBarType == 'Song Name')
 		{
 			if (!cpuControlled) timeTxt.text = SONG.song;
@@ -574,7 +578,7 @@ class PlayState extends MusicBeatState
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
 		moveCameraSection();
 
-		healthBar = new Bar(0, FlxG.height * (#if mobile (ClientPrefs.data.mobileHUD == 'V-Slice' || !ClientPrefs.data.downScroll) #else !ClientPrefs.data.downScroll #end ? 0.89 : 0.11), 'healthBar', function() return health, 0, 2);
+		healthBar = new Bar(0, FlxG.height * (#if mobile (ClientPrefs.data.mobileHUD == 'V-Slice' || ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end ? 0.11 : 0.89), 'healthBar', function() return health, 0, 2);
 		healthBar.screenCenter(X);
 		healthBar.leftToRight = false;
 		healthBar.scrollFactor.set();
@@ -601,7 +605,11 @@ class PlayState extends MusicBeatState
 			engineTxt.scrollFactor.set();
 			uiGroup.add(engineTxt);
 
+						#if mobile
+			if (ClientPrefs.data.mobileHUD != 'V-Slice' && ClientPrefs.data.downScroll) {
+			#else
 			if (ClientPrefs.data.downScroll) {
+			#end
 				engineTxt.y = FlxG.height * 0.9 + 45;
 			}
 		}
@@ -634,7 +642,11 @@ class PlayState extends MusicBeatState
 		botplayTxt.borderSize = 1.25;
 		botplayTxt.visible = cpuControlled;
 		uiGroup.add(botplayTxt);
-		if(ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
+				#if mobile
+		if (ClientPrefs.data.mobileHUD != 'V-Slice' && ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
+		#else
+		if (ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
+		#end
 
 		switch (ClientPrefs.data.botplayName) {
 			case 'Normal':
@@ -1341,7 +1353,7 @@ class PlayState extends MusicBeatState
 					{
 						note.copyAlpha = false;
 						note.alpha = note.multAlpha;
-						if(ClientPrefs.data.middleScroll && !note.mustPress)
+						if(ClientPrefs.data.middleScroll && !useVSliceHUD && !note.mustPress)
 							note.alpha *= 0.35;
 					}
 				});
@@ -1587,6 +1599,11 @@ class PlayState extends MusicBeatState
 	private var eventsPushed:Array<String> = [];
 	private function generateSong(dataPath:String):Void
 	{
+		#if mobile
+		var useVSliceHUD:Bool = ClientPrefs.data.mobileHUD == 'V-Slice';
+		#else
+		var useVSliceHUD:Bool = false;
+		#end
 		// FlxG.log.add(ChartParser.parse());
 		songSpeed = PlayState.SONG.speed;
 		songSpeedType = ClientPrefs.getGameplaySetting('scrolltype');
@@ -1710,7 +1727,7 @@ class PlayState extends MusicBeatState
 								oldNote.updateHitbox();
 							}
 
-							if(ClientPrefs.data.downScroll)
+							if (useVSliceHUD ? gottaHitNote : ClientPrefs.data.downScroll)
 								sustainNote.correctionOffset = 0;
 						}
 						else if(oldNote.isSustainNote)
@@ -1719,8 +1736,9 @@ class PlayState extends MusicBeatState
 							oldNote.updateHitbox();
 						}
 
+						if (useVSliceHUD) sustainNote.flipY = gottaHitNote;
 						if (sustainNote.mustPress) sustainNote.x += FlxG.width / 2; // general offset
-						else if(ClientPrefs.data.middleScroll)
+						else if(ClientPrefs.data.middleScroll && !useVSliceHUD)
 						{
 							sustainNote.x += 310;
 							if(daNoteData > 1) //Up and Right
@@ -1729,11 +1747,12 @@ class PlayState extends MusicBeatState
 					}
 				}
 
+				if (useVSliceHUD) swagNote.flipY = gottaHitNote;
 				if (swagNote.mustPress)
 				{
 					swagNote.x += FlxG.width / 2; // general offset
 				}
-				else if(ClientPrefs.data.middleScroll)
+				else if(ClientPrefs.data.middleScroll && !useVSliceHUD)
 				{
 					swagNote.x += 310;
 					if(daNoteData > 1) //Up and Right
@@ -1845,7 +1864,7 @@ class PlayState extends MusicBeatState
 			}
 
 			var babyArrow:StrumNote = new StrumNote(strumLineX, strumLineY, i, player);
-			babyArrow.downScroll = useVSliceHUD ? true : ClientPrefs.data.downScroll;
+			babyArrow.downScroll = useVSliceHUD ? player == 1 : ClientPrefs.data.downScroll;
 			if (!isStoryMode && !skipArrowStartTween)
 			{
 				//babyArrow.y -= 10;
@@ -3660,7 +3679,7 @@ class PlayState extends MusicBeatState
 		}
 
 		if (generatedMusic)
-			notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
+			notes.sort(FlxSort.byY, #if mobile (ClientPrefs.data.mobileHUD == 'V-Slice' ? false : ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
 		iconP1.scale.set(1.2, 1.2);
 		iconP2.scale.set(1.2, 1.2);
