@@ -222,7 +222,7 @@ class Note extends FlxSprite
 		this.inEditor = inEditor;
 		this.moves = false;
 
-		x += (#if mobile (ClientPrefs.data.mobileHUD != 'V-Slice' && ClientPrefs.data.middleScroll) #else ClientPrefs.data.middleScroll #end ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50;
+		x += (#if mobile (ClientPrefs.data.controlStyle != 'Official' && ClientPrefs.data.middleScroll) #else ClientPrefs.data.middleScroll #end ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?
 		y -= 2000;
 		this.strumTime = strumTime;
