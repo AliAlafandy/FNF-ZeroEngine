@@ -44,6 +44,11 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		addOption(option);
 
 		#if mobile
+		option = new Option('Mobile HUD',
+			'Select the mobile gameplay layout. V-Slice uses touch strumlines; Hitbox and Virtual-Pad keep the existing controls.',
+			'mobileHUD', 'string', ['V-Slice', 'Hitbox', 'Virtual-Pad']);
+		addOption(option);
+
 		option = new Option('Allow Phone Screensaver',
 			'If checked, the phone will sleep after going inactive for few seconds.\n(The time depends on your phone\'s options)', 'screensaver', 'bool');
 		option.onChange = () -> lime.system.System.allowScreenTimeout = curOption.getValue();
