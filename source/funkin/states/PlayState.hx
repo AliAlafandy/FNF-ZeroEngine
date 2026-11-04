@@ -606,8 +606,8 @@ class PlayState extends MusicBeatState
 			engineTxt.scrollFactor.set();
 			uiGroup.add(engineTxt);
 
-						#if mobile
-			if (MobileData.mode != 4 && ClientPrefs.data.downScroll) {
+			#if mobile
+			if ((MobileData.mode != 4 || MobileData.mode == 4) && ClientPrefs.data.downScroll) {
 			#else
 			if (ClientPrefs.data.downScroll) {
 			#end
@@ -643,8 +643,9 @@ class PlayState extends MusicBeatState
 		botplayTxt.borderSize = 1.25;
 		botplayTxt.visible = cpuControlled;
 		uiGroup.add(botplayTxt);
-				#if mobile
-		if (MobileData.mode != 4 && ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
+
+		#if mobile
+		if ((MobileData.mode != 4 || MobileData.mode == 4) && ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
 		#else
 		if (ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
 		#end
@@ -754,7 +755,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 		else
-			removeMobileControls();
+		removeMobileControls();
 		MobileData.forcedMode = null;
 		#end
 
@@ -1862,18 +1863,21 @@ class PlayState extends MusicBeatState
 	private function generateStaticArrows(player:Int):Void
 	{
 		#if mobile
-		var useMobileLayout:Bool = MobileData.mode == 4;
+		var useMobileLayout:Bool = (MobileData.mode == 4);
 		#else
 		var useMobileLayout:Bool = false;
 		#end
+
 		var strumLineX:Float = useMobileLayout ? 0 : (ClientPrefs.data.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X);
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
+
 		#if mobile
 		var amplification:Float = (FlxG.width / FlxG.height) / (16 / 9);
 		var playerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * amplification;
 		var playerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * amplification);
 		var opponentScale:Float = 0.4 * amplification;
 		#end
+
 		for (i in 0...4)
 		{
 			var targetAlpha:Float = 1;
@@ -1885,6 +1889,7 @@ class PlayState extends MusicBeatState
 
 			var babyArrow:StrumNote = new StrumNote(strumLineX, strumLineY, i, player);
 			babyArrow.downScroll = useMobileLayout ? player == 1 : ClientPrefs.data.downScroll;
+
 			#if mobile
 			if (useMobileLayout)
 			{
@@ -1894,6 +1899,7 @@ class PlayState extends MusicBeatState
 				targetAlpha = 1;
 			}
 			#end
+
 			if (!isStoryMode && !skipArrowStartTween)
 			{
 				babyArrow.alpha = 0;
@@ -1922,9 +1928,7 @@ class PlayState extends MusicBeatState
 				{
 					babyArrow.x = (FlxG.width - (playerSpacing * 3 + babyArrow.width)) * 0.5 + playerSpacing * i;
 					babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
-				}
-				else
-				{
+				} else {
 					babyArrow.x = 18 + (Note.swagWidth * opponentScale) * i;
 					babyArrow.y = FlxG.height * 0.035;
 				}
@@ -3258,16 +3262,10 @@ class PlayState extends MusicBeatState
 	}
 
 	#if mobile
-	/**
-	 * Let mobile players hit the actual player receptors, like Official's
-	 * touch-enabled strumline. Each finger can hold a lane for sustain notes.
-	 */
 	private var mobileStrumTouchState:Array<Bool> = [false, false, false, false];
 
 	private function updateMobileStrums():Void
 	{
-		// The receptor touch input belongs only to Official mode. The other
-		// mobile layouts continue to use their original button controls.
 		if (MobileData.mode != 4)
 		{
 			for (lane in 0...4)
@@ -3283,14 +3281,11 @@ class PlayState extends MusicBeatState
 			for (touch in FlxG.touches.list) {
 				if (!touch.pressed) continue;
 
-				// Convert the physical touch coordinate into the HUD camera's view.
 				var touchPoint:FlxPoint = touch.getScreenPosition(camHUD, FlxPoint.get());
 				for (lane in 0...playerStrums.length) {
 					var receptor:StrumNote = playerStrums.members[lane];
 					if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
 
-					// FNF Mobile uses four broad touch lanes instead of requiring
-					// the player to hit the small receptor graphic precisely.
 					var laneLeft:Float = lane == 0 ? 0 : ((playerStrums.members[lane - 1].x + playerStrums.members[lane - 1].width * 0.5) + (receptor.x + receptor.width * 0.5)) * 0.5;
 					var laneRight:Float = lane == playerStrums.length - 1 ? FlxG.width
 						: ((receptor.x + receptor.width * 0.5) + (playerStrums.members[lane + 1].x + playerStrums.members[lane + 1].width * 0.5)) * 0.5;
@@ -3654,8 +3649,6 @@ class PlayState extends MusicBeatState
 		FunkinLua.customFunctions.clear();
 		#end
 
-		// Stop and dispose Lua-created videos whenever gameplay is destroyed:
-		// restart, exit to menu, or any other state transition.
 		#if LUA_ALLOWED
 		#if VIDEOS_ALLOWED
 		if (modchartVideos != null)
