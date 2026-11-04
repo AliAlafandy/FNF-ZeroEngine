@@ -6,6 +6,7 @@ import funkin.data.backend.WeekData;
 import funkin.data.backend.Song;
 import funkin.data.backend.Section;
 import funkin.data.backend.Rating;
+import mobile.data.backend.MobileData;
 
 import flixel.FlxBasic;
 import flixel.FlxObject;
@@ -1272,7 +1273,7 @@ class PlayState extends MusicBeatState
 	public function startCountdown()
 	{
 		#if mobile
-		mobileControls.instance.visible = true;
+		mobileControls.instance.visible = ClientPrefs.data.controlStyle != 'Official';
 		#end
 		
 		if(startedCountdown) {
