@@ -1018,31 +1018,40 @@ class FunkinLua {
 			game.modchartSprites.set(tag, leSprite);
 		});
 		Lua_helper.add_callback(lua, "makeVideoSprite", function(tag:String, video:String, ?x:Float = 0, ?y:Float = 0, ?loop:Dynamic = false) {
-		    #if VIDEOS_ALLOWED
-		    tag = tag.replace('.', '');
-		    LuaUtils.resetSpriteTag(tag);
-		    var leSprite:ModchartVideo = new ModchartVideo(x, y);
+			#if VIDEOS_ALLOWED
+			tag = tag.replace('.', '');
+			LuaUtils.resetSpriteTag(tag);
 
-		    if (leSprite.load(Paths.video(video)))
-		    {
-				leSprite.play();
-		        leSprite.bitmap.onEndReached.add(function() {
-		            if (!loop)
-		            {
-						leSprite.destroy();
-		                game.modchartVideos.remove(tag);
-		            } else {
-		                // leSprite.bitmap.position = 0.0;
-		                // leSprite.play();
-						leSprite.load(Paths.video(video), loop ? ['input-repeat=65545'] : null);
-		            }
-		        });
+			var shouldLoop:Bool = (loop == true);
+			var leSprite:ModchartVideo = new ModchartVideo(x, y);
+			var videoPath:String = Paths.video(video);
+			var videoOptions:Array<String> = shouldLoop ? ['input-repeat=65545'] : [];
+
+			if (!leSprite.load(videoPath, videoOptions))
+			{
+				leSprite.destroy();
+				return;
 			}
-		    game.modchartVideos.set(tag, leSprite);
-		    leSprite.active = true;
-		    #end
-		});
 
+			// Register before playback so cleanup can always find the active instance.
+			game.modchartVideos.set(tag, leSprite);
+			leSprite.active = true;
+
+			if (!shouldLoop && leSprite.bitmap != null)
+			{
+				leSprite.bitmap.onEndReached.add(function() {
+					// Ignore stale callbacks if this tag has already been replaced.
+					if (game.modchartVideos.get(tag) != leSprite) return;
+
+					LuaUtils.getTargetInstance().remove(leSprite, true);
+					game.modchartVideos.remove(tag);
+					leSprite.destroy();
+				});
+			}
+
+			leSprite.play();
+			#end
+		});
 		Lua_helper.add_callback(lua, "pauseVideoSprite", function(tag:String) {
 			#if VIDEOS_ALLOWED
     		var spr:ModchartVideo = game.modchartVideos.get(tag);
@@ -1218,39 +1227,35 @@ class FunkinLua {
 		});
 
 		Lua_helper.add_callback(lua, "removeLuaSprite", function(tag:String, destroy:Bool = true) {
-			if(!game.modchartSprites.exists(tag)) {
-				return;
-			}
+			if (game.modchartSprites.exists(tag))
+			{
+				var sprite:ModchartSprite = game.modchartSprites.get(tag);
+				if (destroy) sprite.kill();
 
-			var pee:ModchartSprite = game.modchartSprites.get(tag);
-			if(destroy) {
-				pee.kill();
-			}
-
-			LuaUtils.getTargetInstance().remove(pee, true);
-			if(destroy) {
-				pee.destroy();
-				game.modchartSprites.remove(tag);
+				LuaUtils.getTargetInstance().remove(sprite, true);
+				if (destroy)
+				{
+					sprite.destroy();
+					game.modchartSprites.remove(tag);
+				}
 			}
 
 			#if VIDEOS_ALLOWED
-			if (!game.modchartVideos.exists(tag)) {
-				return;
-			}
+			if (game.modchartVideos.exists(tag))
+			{
+				var video:ModchartVideo = game.modchartVideos.get(tag);
+				if (destroy) video.kill();
+				else video.pause();
 
-    		var poo:ModchartVideo = game.modchartVideos.get(tag);
-			if(destroy) {
-				poo.kill();
-			}
-
-			LuaUtils.getTargetInstance().remove(poo, true);
-			if(destroy) {
-				poo.destroy();
-				game.modchartVideos.remove(tag);
+				LuaUtils.getTargetInstance().remove(video, true);
+				if (destroy)
+				{
+					game.modchartVideos.remove(tag);
+					video.destroy();
+				}
 			}
 			#end
 		});
-
 		Lua_helper.add_callback(lua, "luaSpriteExists", function(tag:String) {
 			return game.modchartSprites.exists(tag);
 		});
