@@ -962,7 +962,7 @@ class PlayState extends MusicBeatState
 		if (gf != null)
 			gfColor = FlxColor.fromRGB(gf.healthColorArray[0], gf.healthColorArray[1], gf.healthColorArray[2]);
 
-		var section:Section = (SONG != null && SONG.notes != null && curSection >= 0 && curSection < SONG.notes.length)
+		var section = (SONG != null && SONG.notes != null && curSection >= 0 && curSection < SONG.notes.length)
 			? SONG.notes[curSection] : null;
 
 		var speakerColor:FlxColor = dadColor;
@@ -1314,6 +1314,12 @@ class PlayState extends MusicBeatState
 				return true;
 			}
 			moveCameraSection();
+
+			#if mobile
+			var useVSliceHUD:Bool = MobileData.mode == 4;
+			#else
+			var useVSliceHUD:Bool = false;
+			#end
 
 			startTimer = new FlxTimer().start(Conductor.crochet / 1000 / playbackRate, function(tmr:FlxTimer)
 			{
