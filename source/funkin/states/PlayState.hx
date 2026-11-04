@@ -740,7 +740,12 @@ class PlayState extends MusicBeatState
 		#end
 
 		#if mobile
+		var selectedMobileMode:Int = MobileData.mode;
+		if (ClientPrefs.data.controlStyle == 'Hitbox') selectedMobileMode = 3;
+		else if (selectedMobileMode == 3) selectedMobileMode = 0;
+		MobileData.forcedMode = selectedMobileMode;
 		addMobileControls();
+		MobileData.forcedMode = null;
 		mobileControls.instance.visible = ClientPrefs.data.controlStyle != 'Official';
 		mobileControls.onButtonDown.add(onButtonPress);
 		mobileControls.onButtonUp.add(onButtonRelease);
