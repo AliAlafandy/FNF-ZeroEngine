@@ -515,7 +515,7 @@ class PlayState extends MusicBeatState
 		timeTxt.visible = updateTime = showTime;
 		
 				#if mobile
-		if (ClientPrefs.data.controlStyle != 'Official' && ClientPrefs.data.downScroll) timeTxt.y = FlxG.height - 44;
+		if (MobileData.mode != 4 && ClientPrefs.data.downScroll) timeTxt.y = FlxG.height - 44;
 		#else
 		if (ClientPrefs.data.downScroll) timeTxt.y = FlxG.height - 44;
 		#end
@@ -579,7 +579,7 @@ class PlayState extends MusicBeatState
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
 		moveCameraSection();
 
-		healthBar = new Bar(0, FlxG.height * (#if mobile (ClientPrefs.data.controlStyle == 'Official' ? 0.10 : (ClientPrefs.data.downScroll ? 0.11 : 0.89)) #else (ClientPrefs.data.downScroll ? 0.11 : 0.89) #end), 'healthBar', function() return health, 0, 2);
+		healthBar = new Bar(0, FlxG.height * (#if mobile (MobileData.mode == 4 ? 0.10 : (ClientPrefs.data.downScroll ? 0.11 : 0.89)) #else (ClientPrefs.data.downScroll ? 0.11 : 0.89) #end), 'healthBar', function() return health, 0, 2);
 		healthBar.screenCenter(X);
 		healthBar.leftToRight = false;
 		healthBar.scrollFactor.set();
@@ -589,13 +589,13 @@ class PlayState extends MusicBeatState
 		uiGroup.add(healthBar);
 
 		iconP1 = new HealthIcon(boyfriend.healthIcon, true);
-		iconP1.y = #if mobile (ClientPrefs.data.controlStyle == 'Official' ? healthBar.y + 10 : healthBar.y - 75) #else healthBar.y - 75 #end;
+		iconP1.y = #if mobile (MobileData.mode == 4 ? healthBar.y + 10 : healthBar.y - 75) #else healthBar.y - 75 #end;
 		iconP1.visible = !ClientPrefs.data.hideHud;
 		iconP1.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP1);
 
 		iconP2 = new HealthIcon(dad.healthIcon, false);
-		iconP2.y = #if mobile (ClientPrefs.data.controlStyle == 'Official' ? healthBar.y + 10 : healthBar.y - 75) #else healthBar.y - 75 #end;
+		iconP2.y = #if mobile (MobileData.mode == 4 ? healthBar.y + 10 : healthBar.y - 75) #else healthBar.y - 75 #end;
 		iconP2.visible = !ClientPrefs.data.hideHud;
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP2);
@@ -607,7 +607,7 @@ class PlayState extends MusicBeatState
 			uiGroup.add(engineTxt);
 
 						#if mobile
-			if (ClientPrefs.data.controlStyle != 'Official' && ClientPrefs.data.downScroll) {
+			if (MobileData.mode != 4 && ClientPrefs.data.downScroll) {
 			#else
 			if (ClientPrefs.data.downScroll) {
 			#end
@@ -644,7 +644,7 @@ class PlayState extends MusicBeatState
 		botplayTxt.visible = cpuControlled;
 		uiGroup.add(botplayTxt);
 				#if mobile
-		if (ClientPrefs.data.controlStyle != 'Official' && ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
+		if (MobileData.mode != 4 && ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
 		#else
 		if (ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
 		#end
@@ -742,12 +742,10 @@ class PlayState extends MusicBeatState
 
 		#if mobile
 		var selectedMobileMode:Int = MobileData.mode;
-		if (ClientPrefs.data.controlStyle == 'Hitbox') selectedMobileMode = 3;
-		else if (selectedMobileMode == 3) selectedMobileMode = 0;
 		MobileData.forcedMode = selectedMobileMode;
 		addMobileControls();
 		MobileData.forcedMode = null;
-		mobileControls.instance.visible = ClientPrefs.data.controlStyle != 'Official';
+		mobileControls.instance.visible = MobileData.mode != 4;
 		mobileControls.onButtonDown.add(onButtonPress);
 		mobileControls.onButtonUp.add(onButtonRelease);
 		#end
@@ -1273,7 +1271,7 @@ class PlayState extends MusicBeatState
 	public function startCountdown()
 	{
 		#if mobile
-		mobileControls.instance.visible = ClientPrefs.data.controlStyle != 'Official';
+		mobileControls.instance.visible = MobileData.mode != 4;
 		#end
 		
 		if(startedCountdown) {
@@ -1606,7 +1604,7 @@ class PlayState extends MusicBeatState
 	private function generateSong(dataPath:String):Void
 	{
 		#if mobile
-		var useVSliceHUD:Bool = ClientPrefs.data.controlStyle == 'Official';
+		var useVSliceHUD:Bool = MobileData.mode == 4;
 		#else
 		var useVSliceHUD:Bool = false;
 		#end
@@ -1850,7 +1848,7 @@ class PlayState extends MusicBeatState
 	private function generateStaticArrows(player:Int):Void
 	{
 		#if mobile
-		var useVSliceHUD:Bool = ClientPrefs.data.controlStyle == 'Official';
+		var useVSliceHUD:Bool = MobileData.mode == 4;
 		#else
 		var useVSliceHUD:Bool = false;
 		#end
@@ -3234,7 +3232,7 @@ class PlayState extends MusicBeatState
 	{
 		// The receptor touch input belongs only to Official mode. The other
 		// mobile layouts continue to use their original button controls.
-		if (ClientPrefs.data.controlStyle != 'Official')
+		if (MobileData.mode != 4)
 		{
 			for (lane in 0...4)
 			{
@@ -3280,7 +3278,7 @@ class PlayState extends MusicBeatState
 	private function onButtonPress(button:TouchButton):Void
 	{
 		#if mobile
-		if (ClientPrefs.data.controlStyle == 'Official') return;
+		if (MobileData.mode == 4) return;
 		#end
 		if (button.IDs.filter(id -> id.toString().startsWith("EXTRA")).length > 0)
 			return;
@@ -3294,7 +3292,7 @@ class PlayState extends MusicBeatState
 	private function onButtonRelease(button:TouchButton):Void
 	{
 		#if mobile
-		if (ClientPrefs.data.controlStyle == 'Official') return;
+		if (MobileData.mode == 4) return;
 		#end
 		if (button.IDs.filter(id -> id.toString().startsWith("EXTRA")).length > 0)
 			return;
@@ -3691,7 +3689,7 @@ class PlayState extends MusicBeatState
 		}
 
 		if (generatedMusic)
-			notes.sort(FlxSort.byY, #if mobile (ClientPrefs.data.controlStyle == 'Official' ? false : ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end ? FlxSort.ASCENDING : FlxSort.DESCENDING);
+			notes.sort(FlxSort.byY, #if mobile (MobileData.mode == 4 ? false : ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
 		iconP1.scale.set(1.2, 1.2);
 		iconP2.scale.set(1.2, 1.2);
