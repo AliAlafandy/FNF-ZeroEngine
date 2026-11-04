@@ -2617,32 +2617,6 @@ class PlayState extends MusicBeatState
 					}
 					lyricsText.text = value1;
 
-					if(ClientPrefs.data.hudColor == 'On') {
-						if(value2 != null && value2.length > 0)
-						{
-							lyricsText.color = CoolUtil.colorFromString(value2);
-						} else {
-							if (!stageData.hide_girlfriend) {
-								if(!SONG.notes[curSection].mustHitSection || SONG.notes[curSection].gfSection || SONG.notes[curSection].mustHitSection)
-								{
-									reloadSubTitlesColor();
-								}
-							} else {
-								if(!SONG.notes[curSection].mustHitSection || SONG.notes[curSection].mustHitSection)
-								{
-									reloadSubTitlesColor();
-								}
-							}
-						}
-					} else {
-						if(value2 != null && value2.length > 0)
-						{
-							lyricsText.color = CoolUtil.colorFromString(value2);
-						} else {
-							lyricsText.color = FlxColor.WHITE;
-						}
-					}
-
 					var speaker:String = (value2 == null) ? "" : Std.string(value2).toLowerCase().trim();
 					var isSpeaker:Bool = (speaker == 'bf' || speaker == 'boyfriend' || speaker == '0'
 						|| speaker == 'dad' || speaker == '1' || speaker == 'gf' || speaker == 'girlfriend' || speaker == '2');
@@ -2654,20 +2628,21 @@ class PlayState extends MusicBeatState
 						case 'dad' | '1':
 							char = dad;
 						case 'gf' | 'girlfriend' | '2':
-							// hide_girlfriend means gf is deliberately not instantiated.
+							// GF is absent on stages which explicitly hide her.
 							if (!stageData.hide_girlfriend) char = gf;
 					}
 
-					// A speaker token is not a color. A non-speaker value may be an explicit color.
 					if (char != null) {
 						var charColor:FlxColor = FlxColor.fromRGB(char.healthColorArray[0], char.healthColorArray[1], char.healthColorArray[2]);
 						lyricsText.color = (charColor == FlxColor.BLACK) ? FlxColor.WHITE : charColor;
-					} else if (ClientPrefs.data.hudColor == 'On' && !isSpeaker) {
-						if (value2 != null && Std.string(value2).trim().length > 0)
-							lyricsText.color = CoolUtil.colorFromString(Std.string(value2));
-						else
+					} else if (isSpeaker || (value2 == null || Std.string(value2).trim().length == 0)) {
+						// A hidden GF speaker falls back to the active section's available character.
+						if (ClientPrefs.data.hudColor == 'On')
 							reloadSubTitlesColor();
-					} else if (!isSpeaker && value2 != null && Std.string(value2).trim().length > 0) {
+						else
+							lyricsText.color = FlxColor.WHITE;
+					} else {
+						// Non-speaker value2 is an explicit subtitle color.
 						lyricsText.color = CoolUtil.colorFromString(Std.string(value2));
 					}
 
