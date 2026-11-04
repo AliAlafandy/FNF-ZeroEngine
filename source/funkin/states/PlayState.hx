@@ -3632,6 +3632,23 @@ class PlayState extends MusicBeatState
 		FunkinLua.customFunctions.clear();
 		#end
 
+		// Stop every Lua-created video when this PlayState is destroyed.
+		// Restarting a song creates a new PlayState, so videos from the old
+		// instance must not continue playing over the new one.
+		#if VIDEOS_ALLOWED
+		for (tag in modchartVideos.keys())
+		{
+			var video:ModchartVideo = modchartVideos.get(tag);
+			if (video != null)
+			{
+				video.pause();
+				remove(video, true);
+				video.destroy();
+			}
+		}
+		modchartVideos.clear();
+		#end
+
 		#if HSCRIPT_ALLOWED
 		for (script in hscriptArray)
 			if(script != null)
