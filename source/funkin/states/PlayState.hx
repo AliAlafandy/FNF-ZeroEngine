@@ -579,7 +579,7 @@ class PlayState extends MusicBeatState
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
 		moveCameraSection();
 
-		healthBar = new Bar(0, FlxG.height * (#if mobile (MobileData.mode == 4 ? 0.10 : (ClientPrefs.data.downScroll ? 0.11 : 0.89)) #else (ClientPrefs.data.downScroll ? 0.11 : 0.89) #end), 'healthBar', function() return health, 0, 2);
+		healthBar = new Bar(0, FlxG.height * (#if mobile (MobileData.mode == 4 ? 0.11 : (!ClientPrefs.data.downScroll ? 0.89 : 0.11) #else (!ClientPrefs.data.downScroll ? 0.89 : 0.11) #end), 'healthBar', function() return health, 0, 2);
 		healthBar.screenCenter(X);
 		healthBar.leftToRight = false;
 		healthBar.scrollFactor.set();
@@ -589,13 +589,13 @@ class PlayState extends MusicBeatState
 		uiGroup.add(healthBar);
 
 		iconP1 = new HealthIcon(boyfriend.healthIcon, true);
-		iconP1.y = #if mobile (MobileData.mode == 4 ? healthBar.y + 10 : healthBar.y - 75) #else healthBar.y - 75 #end;
+		iconP1.y = healthBar.y - 75;
 		iconP1.visible = !ClientPrefs.data.hideHud;
 		iconP1.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP1);
 
 		iconP2 = new HealthIcon(dad.healthIcon, false);
-		iconP2.y = #if mobile (MobileData.mode == 4 ? healthBar.y + 10 : healthBar.y - 75) #else healthBar.y - 75 #end;
+		iconP2.y = healthBar.y - 75;
 		iconP2.visible = !ClientPrefs.data.hideHud;
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP2);
