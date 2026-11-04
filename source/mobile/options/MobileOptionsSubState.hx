@@ -104,9 +104,8 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			'pauseButton',
 			'bool');
 		addOption(option);
-		#end
 
-		var option:Option = new Option('Water Mark',
+		option = new Option('Water Mark',
 			"If checked, it will add water mark like icon.",
 			'waterMark',
 			'bool');
@@ -130,6 +129,7 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			#end
 		};
 		addOption(option);
+		#end
 
 		super();
 	}
