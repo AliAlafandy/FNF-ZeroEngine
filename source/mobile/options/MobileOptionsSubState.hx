@@ -73,7 +73,7 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		addOption(option);
 		#end
 
-		if (MobileData.mode == 3)
+		if (ClientPrefs.data.controlStyle == 'Hitbox')
 		{
 			option = new Option('Hitbox Design',
 				"Choose how your hitbox should look like.",
