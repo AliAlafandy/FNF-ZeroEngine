@@ -1018,29 +1018,39 @@ class FunkinLua {
 			game.modchartSprites.set(tag, leSprite);
 		});
 		Lua_helper.add_callback(lua, "makeVideoSprite", function(tag:String, video:String, ?x:Float = 0, ?y:Float = 0, ?loop:Dynamic = false) {
-		    #if VIDEOS_ALLOWED
-		    tag = tag.replace('.', '');
-		    LuaUtils.resetSpriteTag(tag);
-		    var leSprite:ModchartVideo = new ModchartVideo(x, y);
+			#if VIDEOS_ALLOWED
+			tag = tag.replace('.', '');
+			LuaUtils.resetSpriteTag(tag);
 
-		    if (leSprite.load(Paths.video(video)))
-		    {
-				leSprite.play();
-		        leSprite.bitmap.onEndReached.add(function() {
-		            if (!loop)
-		            {
-						leSprite.destroy();
-		                game.modchartVideos.remove(tag);
-		            } else {
-		                // leSprite.bitmap.position = 0.0;
-		                // leSprite.play();
-						leSprite.load(Paths.video(video), loop ? ['input-repeat=65545'] : null);
-		            }
-		        });
+			var leSprite:ModchartVideo = new ModchartVideo(x, y);
+			if (!leSprite.load(Paths.video(video))) {
+				leSprite.destroy();
+				return;
 			}
-		    game.modchartVideos.set(tag, leSprite);
-		    leSprite.active = true;
-		    #end
+
+			// Register only successfully loaded videos.
+			game.modchartVideos.set(tag, leSprite);
+			leSprite.active = true;
+			leSprite.bitmap.onEndReached.add(function() {
+				if (loop) {
+					// Keep the existing VLC repeat option for compatibility.
+					if (!leSprite.load(Paths.video(video), ['input-repeat=65545'])) {
+						game.remove(leSprite, true);
+						leSprite.kill();
+						leSprite.destroy();
+						if (game.modchartVideos.get(tag) == leSprite)
+							game.modchartVideos.remove(tag);
+					}
+				} else {
+					game.remove(leSprite, true);
+					leSprite.kill();
+					leSprite.destroy();
+					// Do not remove a newer video that reused this tag.
+					if (game.modchartVideos.get(tag) == leSprite)
+						game.modchartVideos.remove(tag);
+				}
+			});
+			#end
 		});
 
 		Lua_helper.add_callback(lua, "pauseVideoSprite", function(tag:String) {
