@@ -224,7 +224,7 @@ class Main extends Sprite
 		var bitmapData = Assets.getBitmapData(imagePath);
 		waterMark = new Sprite();
 		waterMark.addChild(new Bitmap(bitmapData));
-		waterMark.scale.set(2, 2);
+		//waterMark.scale.set(2, 2);
 		waterMark.alpha = 0.6; // 0.4
 		updateWaterMarkPosition();
 		Lib.current.stage.addChild(waterMark);
