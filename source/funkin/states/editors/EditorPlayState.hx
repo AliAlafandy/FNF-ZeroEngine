@@ -538,41 +538,72 @@ class EditorPlayState extends MusicBeatSubstate
 	
 	private function generateStaticArrows(player:Int):Void
 	{
-		var strumLineX:Float = ClientPrefs.data.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X;
-		var strumLineY:Float = ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50;
+		#if mobile
+		var useMobileLayout:Bool = MobileData.mode == 4;
+		#else
+		var useMobileLayout:Bool = false;
+		#end
+		var strumLineX:Float = useMobileLayout ? 0 : (ClientPrefs.data.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X);
+		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
+		#if mobile
+		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+		var playerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * amplification;
+		var playerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * amplification);
+		var opponentScale:Float = 0.4 * amplification;
+		#end
 		for (i in 0...4)
 		{
-			// FlxG.log.add(i);
 			var targetAlpha:Float = 1;
-			if (player < 1)
+			if (player < 1 && !useMobileLayout)
 			{
 				if(!ClientPrefs.data.opponentStrums) targetAlpha = 0;
 				else if(ClientPrefs.data.middleScroll) targetAlpha = 0.35;
 			}
 
 			var babyArrow:StrumNote = new StrumNote(strumLineX, strumLineY, i, player);
-			babyArrow.downScroll = ClientPrefs.data.downScroll;
+			babyArrow.downScroll = useMobileLayout ? player == 1 : ClientPrefs.data.downScroll;
+			#if mobile
+			if (useMobileLayout)
+			{
+				var arrowScale:Float = player == 1 ? playerScale : opponentScale;
+				babyArrow.scale.set(arrowScale, arrowScale);
+				babyArrow.updateHitbox();
+				targetAlpha = 1;
+			}
+			#end
 			babyArrow.alpha = targetAlpha;
 
 			if (player == 1)
 				playerStrums.add(babyArrow);
 			else
 			{
-				if(ClientPrefs.data.middleScroll)
+				if(ClientPrefs.data.middleScroll && !useMobileLayout)
 				{
 					babyArrow.x += 310;
-					if(i > 1) { //Up and Right
-						babyArrow.x += FlxG.width / 2 + 25;
-					}
+					if(i > 1) babyArrow.x += FlxG.width / 2 + 25;
 				}
 				opponentStrums.add(babyArrow);
 			}
 
 			strumLineNotes.add(babyArrow);
 			babyArrow.postAddedToGroup();
+			#if mobile
+			if (useMobileLayout)
+			{
+				if (player == 1)
+				{
+					babyArrow.x = (FlxG.width - (playerSpacing * 3 + babyArrow.width)) * 0.5 + playerSpacing * i;
+					babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
+				}
+				else
+				{
+					babyArrow.x = 18 + (Note.swagWidth * opponentScale) * i;
+					babyArrow.y = FlxG.height * 0.035;
+				}
+			}
+			#end
 		}
 	}
-
 	public function finishSong():Void
 	{
 		if(ClientPrefs.data.noteOffset <= 0) {
