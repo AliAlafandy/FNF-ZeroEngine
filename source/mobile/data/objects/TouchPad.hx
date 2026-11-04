@@ -5,6 +5,8 @@ import flixel.util.FlxSignal.FlxTypedSignal;
 @:access(mobile.data.objects.TouchButton)
 class TouchPad extends MobileInputManager implements IMobileControls
 {
+	// The mobile control presets are authored for this logical width.
+	public static inline var BASE_SCREEN_WIDTH:Float = 1280;
 	public var buttonLeft:TouchButton = new TouchButton(0, 0, [MobileInputID.LEFT, MobileInputID.NOTE_LEFT]);
 	public var buttonUp:TouchButton = new TouchButton(0, 0, [MobileInputID.UP, MobileInputID.NOTE_UP]);
 	public var buttonRight:TouchButton = new TouchButton(0, 0, [MobileInputID.RIGHT, MobileInputID.NOTE_RIGHT]);
@@ -95,10 +97,14 @@ class TouchPad extends MobileInputManager implements IMobileControls
 				setExtrasPos();
 			case DOUBLE:
 				add(buttonExtra = createButton(0, FlxG.height - 137, 's', 0xFF0066FF));
-				add(buttonExtra2 = createButton(FlxG.width - 132, FlxG.height - 137, 'g', 0xA6FF00));
+				add(buttonExtra2 = createButton(BASE_SCREEN_WIDTH - 132, FlxG.height - 137, 'g', 0xA6FF00));
 				setExtrasPos();
 			case NONE: // nothing
 		}
+
+		// Keep left-side controls fixed and move right-side controls with the
+		// right screen edge when Wide Screen Mode expands the logical viewport.
+		applyWideScreenAnchors();
 
 		alpha = ClientPrefs.data.controlsAlpha;
 		scrollFactor.set();
@@ -121,6 +127,38 @@ class TouchPad extends MobileInputManager implements IMobileControls
 		}
 	}
 
+	/**
+	 * Reposition controls without changing their preset or saved coordinates.
+	 * Saved positions always use the original 1280px layout as their reference.
+	 */
+	public function applyWideScreenAnchors():Void
+	{
+		if (!ClientPrefs.data.wideScreen)
+			return;
+
+		var extraWidth = FlxG.width - BASE_SCREEN_WIDTH;
+		if (extraWidth <= 0)
+			return;
+
+		for (fieldName in Reflect.fields(this))
+		{
+			var button:Dynamic = Reflect.field(this, fieldName);
+			if (Std.isOfType(button, TouchButton) && button.exists && button.x + (button.width * 0.5) >= BASE_SCREEN_WIDTH * 0.5)
+			{
+				button.x += extraWidth;
+				if (button.bounds != null)
+					button.bounds.x += extraWidth;
+			}
+		}
+	}
+
+	public static function normalizeSavedX(x:Float, width:Float):Float
+	{
+		if (ClientPrefs.data.wideScreen && FlxG.width > BASE_SCREEN_WIDTH && x + width * 0.5 >= BASE_SCREEN_WIDTH * 0.5)
+			return x - (FlxG.width - BASE_SCREEN_WIDTH);
+		return x;
+	}
+
 	public function setExtrasDefaultPos()
 	{
 		var int:Int = 0;
@@ -133,7 +171,7 @@ class TouchPad extends MobileInputManager implements IMobileControls
 			var field = Reflect.field(this, button);
 			if (button.toLowerCase().contains('extra') && Std.isOfType(field, TouchButton))
 			{
-				MobileData.save.data.extraData[int] = FlxPoint.get(field.x, field.y);
+				MobileData.save.data.extraData[int] = FlxPoint.get(normalizeSavedX(field.x, field.width), field.y);
 				++int;
 			}
 		}
