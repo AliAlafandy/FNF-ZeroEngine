@@ -3230,17 +3230,20 @@ class PlayState extends MusicBeatState
 			for (touch in FlxG.touches.list) {
 				if (!touch.pressed) continue;
 
+				// Convert the physical touch coordinate into the HUD camera's view.
+				var touchPoint:FlxPoint = touch.getViewPosition(camHUD);
 				for (lane in 0...playerStrums.length) {
 					var receptor:StrumNote = playerStrums.members[lane];
 					if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
 
 					var padX:Float = receptor.width * 0.15;
 					var padY:Float = receptor.height * 0.15;
-					if (touch.screenX >= receptor.x - padX && touch.screenX <= receptor.x + receptor.width + padX
-						&& touch.screenY >= receptor.y - padY && touch.screenY <= receptor.y + receptor.height + padY) {
+					if (touchPoint.x >= receptor.x - padX && touchPoint.x <= receptor.x + receptor.width + padX
+						&& touchPoint.y >= receptor.y - padY && touchPoint.y <= receptor.y + receptor.height + padY) {
 						touched[lane] = true;
 					}
 				}
+				touchPoint.put();
 			}
 		}
 
