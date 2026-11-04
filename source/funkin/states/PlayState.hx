@@ -743,11 +743,19 @@ class PlayState extends MusicBeatState
 		#if mobile
 		var selectedMobileMode:Int = MobileData.mode;
 		MobileData.forcedMode = selectedMobileMode;
-		addMobileControls();
+		if (selectedMobileMode != 4)
+		{
+			addMobileControls();
+			if (mobileControls != null && mobileControls.instance != null)
+			{
+				mobileControls.instance.visible = true;
+				mobileControls.onButtonDown.add(onButtonPress);
+				mobileControls.onButtonUp.add(onButtonRelease);
+			}
+		}
+		else
+			removeMobileControls();
 		MobileData.forcedMode = null;
-		mobileControls.instance.visible = MobileData.mode != 4;
-		mobileControls.onButtonDown.add(onButtonPress);
-		mobileControls.onButtonUp.add(onButtonRelease);
 		#end
 
 		startCallback();
@@ -1271,7 +1279,7 @@ class PlayState extends MusicBeatState
 	public function startCountdown()
 	{
 		#if mobile
-		mobileControls.instance.visible = MobileData.mode != 4;
+		if (mobileControls != null && mobileControls.instance != null) mobileControls.instance.visible = true;
 		#end
 		
 		if(startedCountdown) {
