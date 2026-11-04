@@ -514,8 +514,8 @@ class PlayState extends MusicBeatState
 		timeTxt.borderSize = 2;
 		timeTxt.visible = updateTime = showTime;
 		
-				#if mobile
-		if (MobileData.mode != 4 && ClientPrefs.data.downScroll) timeTxt.y = FlxG.height - 44;
+		#if mobile
+		if (MobileData.mode == 4 || (MobileData.mode != 4 && ClientPrefs.data.downScroll)) timeTxt.y = FlxG.height - 44;
 		#else
 		if (ClientPrefs.data.downScroll) timeTxt.y = FlxG.height - 44;
 		#end
@@ -607,7 +607,7 @@ class PlayState extends MusicBeatState
 			uiGroup.add(engineTxt);
 
 			#if mobile
-			if ((MobileData.mode != 4 || MobileData.mode == 4) && ClientPrefs.data.downScroll) {
+			if (MobileData.mode == 4 || (MobileData.mode != 4 && ClientPrefs.data.downScroll)) {
 			#else
 			if (ClientPrefs.data.downScroll) {
 			#end
@@ -645,7 +645,7 @@ class PlayState extends MusicBeatState
 		uiGroup.add(botplayTxt);
 
 		#if mobile
-		if ((MobileData.mode != 4 || MobileData.mode == 4) && ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
+		if (MobileData.mode == 4 || (MobileData.mode != 4 && ClientPrefs.data.downScroll)) botplayTxt.y = timeBar.y - 78;
 		#else
 		if (ClientPrefs.data.downScroll) botplayTxt.y = timeBar.y - 78;
 		#end
@@ -1325,7 +1325,7 @@ class PlayState extends MusicBeatState
 			moveCameraSection();
 
 			#if mobile
-			var useVSliceHUD:Bool = MobileData.mode == 4;
+			var useVSliceHUD:Bool = (MobileData.mode == 4);
 			#else
 			var useVSliceHUD:Bool = false;
 			#end
@@ -1619,7 +1619,7 @@ class PlayState extends MusicBeatState
 	private function generateSong(dataPath:String):Void
 	{
 		#if mobile
-		var useVSliceHUD:Bool = MobileData.mode == 4;
+		var useVSliceHUD:Bool = (MobileData.mode == 4);
 		#else
 		var useVSliceHUD:Bool = false;
 		#end
@@ -1755,7 +1755,7 @@ class PlayState extends MusicBeatState
 							oldNote.updateHitbox();
 						}
 
-						if (useVSliceHUD) sustainNote.flipY = gottaHitNote;
+						//if (useVSliceHUD) sustainNote.flipY = gottaHitNote;
 						if (sustainNote.mustPress) sustainNote.x += FlxG.width / 2; // general offset
 						else if(ClientPrefs.data.middleScroll && !useVSliceHUD)
 						{
@@ -1766,7 +1766,7 @@ class PlayState extends MusicBeatState
 					}
 				}
 
-				if (useVSliceHUD) swagNote.flipY = gottaHitNote;
+				//if (useVSliceHUD) swagNote.flipY = gottaHitNote;
 				if (swagNote.mustPress)
 				{
 					swagNote.x += FlxG.width / 2; // general offset
@@ -1921,11 +1921,11 @@ class PlayState extends MusicBeatState
 
 			strumLineNotes.add(babyArrow);
 			babyArrow.postAddedToGroup();
+
 			#if mobile
 			if (useMobileLayout)
 			{
-				if (player == 1)
-				{
+				if (player == 1) {
 					babyArrow.x = (FlxG.width - (playerSpacing * 3 + babyArrow.width)) * 0.5 + playerSpacing * i;
 					babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
 				} else {
