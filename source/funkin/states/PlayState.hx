@@ -1907,10 +1907,14 @@ class PlayState extends MusicBeatState
 			}
 			else babyArrow.alpha = targetAlpha;
 
-			if (player == 1)
+			if (player == 1) {
+				if(useMobileLayout)
+				{
+					if(i > 5) babyArrow.x += (FlxG.width / 2) + 5;
+					else babyArrow.x += (FlxG.width / 2) - 5;
+				}
 				playerStrums.add(babyArrow);
-			else
-			{
+			} else {
 				if(ClientPrefs.data.middleScroll && !useMobileLayout)
 				{
 					babyArrow.x += 310;
