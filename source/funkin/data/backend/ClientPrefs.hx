@@ -10,7 +10,7 @@ import funkin.states.TitleState;
 @:structInit class SaveVariables {
 	// Mobile and Mobile Controls Releated
 	public var extraButtons:String = "NONE"; // mobile extra button option
-	public var mobileHUD:String = "V-Slice"; // mobile gameplay HUD layout
+	public var controlStyle:String = "Official"; // mobile gameplay HUD layout
 	public var hitboxPos:Bool = true; // hitbox extra button position option
 	public var dynamicColors:Bool = true; // yes cause its cool -Karim
 	public var controlsAlpha:Float = FlxG.onMobile ? 0.6 : 0;
