@@ -21,6 +21,7 @@ class MobileControls extends FlxTypedSpriteGroup<MobileInputManager>
 				initControler(2, extra);
 			case 3: // HITBOX
 				initControler(3, extra);
+			case 4: // OFFICIAL: use the receptor touch controls instead of a virtual pad.
 		}
 		alpha = ClientPrefs.data.controlsAlpha;
 	}
