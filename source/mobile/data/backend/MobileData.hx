@@ -41,14 +41,14 @@ class MobileData
 		{
 			save.data.buttons = new Array();
 			for (buttons in touchPad)
-				save.data.buttons.push(FlxPoint.get(buttons.x, buttons.y));
+				save.data.buttons.push(FlxPoint.get(TouchPad.normalizeSavedX(buttons.x, buttons.width), buttons.y));
 		}
 		else
 		{
 			var tempCount:Int = 0;
 			for (buttons in touchPad)
 			{
-				save.data.buttons[tempCount] = FlxPoint.get(buttons.x, buttons.y);
+				save.data.buttons[tempCount] = FlxPoint.get(TouchPad.normalizeSavedX(buttons.x, buttons.width), buttons.y);
 				tempCount++;
 			}
 		}
@@ -73,6 +73,7 @@ class MobileData
 			tempCount++;
 		}
 
+		touchPad.applyWideScreenAnchors();
 		return touchPad;
 	}
 
