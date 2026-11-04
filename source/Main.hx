@@ -51,7 +51,7 @@ class Main extends Sprite
 
 	public static var fpsVar:FPSCounter;
 
-	#if mobile
+	#if android
 	public static var waterMark:Sprite;
 	#end
 
@@ -194,7 +194,7 @@ class Main extends Sprite
 		});
 	}
 
-	#if mobile
+	#if android
 	static function onWaterMarkResize(event:Event):Void
 	{
 		updateWaterMarkPosition();
