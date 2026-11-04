@@ -25,12 +25,26 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		title = 'Mobile Options';
 		rpcTitle = 'Mobile Options Menu'; // for Discord Rich Presence, fuck it
 
-		option = new Option('Extra Controls', 'Select how many extra buttons you prefer to have?\nThey can be used for mechanics with LUA or HScript.',
-			'extraButtons', 'string', exControlTypes);
+		#if mobile
+		option = new Option('Control Style',
+			"Select the mobile gameplay layout.",
+			'controlStyle',
+			'string',
+			['Official', 'Hitbox', 'Virtual-Pad']);
+		addOption(option);
+		#end
+
+		option = new Option('Extra Controls',
+			"Select how many extra buttons you prefer to have?\nThey can be used for mechanics with LUA or HScript.",
+			'extraButtons',
+			'string',
+			exControlTypes);
 		addOption(option);
 
 		option = new Option('Mobile Controls Opacity',
-			'Selects the opacity for the mobile buttons (careful not to put it at 0 and lose track of your buttons).', 'controlsAlpha', 'percent');
+			"Selects the opacity for the mobile buttons (careful not to put it at 0 and lose track of your buttons).",
+			'controlsAlpha',
+			'percent');
 		option.scrollSpeed = 1;
 		option.minValue = 0.001;
 		option.maxValue = 1;
@@ -44,47 +58,56 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		addOption(option);
 
 		#if mobile
-		option = new Option('Mobile HUD',
-			'Select the mobile gameplay layout. V-Slice uses touch strumlines; Hitbox and Virtual-Pad keep the existing controls.',
-			'mobileHUD', 'string', ['V-Slice', 'Hitbox', 'Virtual-Pad']);
-		addOption(option);
-
 		option = new Option('Allow Phone Screensaver',
-			'If checked, the phone will sleep after going inactive for few seconds.\n(The time depends on your phone\'s options)', 'screensaver', 'bool');
+			"If checked, the phone will sleep after going inactive for few seconds.\n(The time depends on your phone\'s options)",
+			'screensaver',
+			'bool');
 		option.onChange = () -> lime.system.System.allowScreenTimeout = curOption.getValue();
 		addOption(option);
 
 		option = new Option('Wide Screen Mode',
-			'If checked, The game will stetch to fill your whole screen. (WARNING: Can result in bad visuals & break some mods that resizes the game/cameras)',
-			'wideScreen', 'bool');
+			"If checked, The game will stetch to fill your whole screen. (WARNING: Can result in bad visuals & break some mods that resizes the game/cameras)",
+			'wideScreen',
+			'bool');
 		option.onChange = () -> FlxG.scaleMode = new MobileScaleMode();
 		addOption(option);
 		#end
 
 		if (MobileData.mode == 3)
 		{
-			option = new Option('Hitbox Design', 'Choose how your hitbox should look like.', 'hitboxType', 'string', hintOptions);
+			option = new Option('Hitbox Design',
+				"Choose how your hitbox should look like.",
+				'hitboxType',
+				'string',
+				hintOptions);
 			addOption(option);
 
-			option = new Option('Hitbox Position', 'If checked, the hitbox will be put at the bottom of the screen, otherwise will stay at the top.',
-				'hitboxPos', 'bool');
+			option = new Option('Hitbox Position',
+				"If checked, the hitbox will be put at the bottom of the screen, otherwise will stay at the top.",
+				'hitboxPos',
+				'bool');
 			addOption(option);
 		}
 
 		option = new Option('Dynamic Controls Color',
-			'If checked, the mobile controls color will be set to the notes color in your settings.\n(have effect during gameplay only)', 'dynamicColors',
+			"If checked, the mobile controls color will be set to the notes color in your settings.\n(have effect during gameplay only)",
+			'dynamicColors',
 			'bool');
 		addOption(option);
 
 		#if android
-		option = new Option('Storage Type', 'Which folder Psych Engine should use?\n(CHANGING THIS MAKES DELETE YOUR OLD FOLDER!!)', 'storageType', 'string',
+		option = new Option('Storage Type',
+			"Which folder Psych Engine should use?\n(CHANGING THIS MAKES DELETE YOUR OLD FOLDER!!)",
+			'storageType',
+			'string',
 			storageTypes);
 		addOption(option);
 		#end
 
 		#if android
 		option = new Option('Pause Button',
-			'If unchecked, remove pause button from play zone.\n(you can use BACK button in both cases)', 'pauseButton',
+			"If unchecked, remove pause button from play zone.\n(you can use BACK button in both cases)",
+			'pauseButton',
 			'bool');
 		addOption(option);
 		#end
