@@ -202,12 +202,10 @@ class Main extends Sprite
 
 	public static function updateWaterMark():Void
 	{
-		if (waterMark != null && waterMark.parent != null)
-			waterMark.parent.removeChild(waterMark);
-		waterMark = null;
+		/*if (waterMark != null && waterMark.parent != null) waterMark.parent.removeChild(waterMark);
+		waterMark = null;*/
 
-		if (!ClientPrefs.data.waterMark || Lib.current.stage == null)
-			return;
+		if (!ClientPrefs.data.waterMark || Lib.current.stage == null) return;
 
 		var imagePath:String = switch (ClientPrefs.data.watermarkStyle)
 		{
@@ -226,9 +224,13 @@ class Main extends Sprite
 		var bitmapData = Assets.getBitmapData(imagePath);
 		waterMark = new Sprite();
 		waterMark.addChild(new Bitmap(bitmapData));
-		waterMark.alpha = 0.4;
+		waterMark.scale.set(2, 2);
+		waterMark.alpha = 0.6; // 0.4
 		updateWaterMarkPosition();
 		Lib.current.stage.addChild(waterMark);
+		if(waterMark != null) {
+			waterMark.visible = ClientPrefs.data.waterMark;
+		}
 	}
 
 	static function updateWaterMarkPosition():Void
@@ -239,10 +241,9 @@ class Main extends Sprite
 		var stageWidth:Float = Lib.current.stage.stageWidth;
 		var stageHeight:Float = Lib.current.stage.stageHeight;
 
-		// With Wide Screen Mode disabled, Flixel keeps the game viewport
 		// centered and the unused space becomes the side letterbox bars.
 		// Put the watermark inside a side bar instead of over the game.
-		if (!ClientPrefs.data.wideScreen && FlxG.game != null)
+		/*if (FlxG.game != null)
 		{
 			var gameLeft:Float = FlxG.game.x;
 			var gameRight:Float = gameLeft + FlxG.game.width;
@@ -258,9 +259,10 @@ class Main extends Sprite
 				waterMark.x = stageWidth - margin - waterMark.width;
 		}
 		else
-			waterMark.x = stageWidth - 10 - waterMark.width;
+			waterMark.x = stageWidth - 10 - waterMark.width;*/
 
-		waterMark.y = stageHeight - 10 - waterMark.height;
+		waterMark.x = (stageWidth - 10) - waterMark.width;
+		waterMark.y = (stageHeight - 10) - waterMark.height;
 	}
 	#end
 
