@@ -908,10 +908,11 @@ class EditorPlayState extends MusicBeatSubstate
 				var receptor:StrumNote = playerStrums.members[lane];
 				if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
 
-				var padX:Float = receptor.width * 0.15;
-				var padY:Float = receptor.height * 0.15;
-				if (point.x >= receptor.x - padX && point.x <= receptor.x + receptor.width + padX
-					&& point.y >= receptor.y - padY && point.y <= receptor.y + receptor.height + padY)
+				// Match the broad, thumb-friendly FNF Mobile lane hit areas.
+				var laneLeft:Float = lane == 0 ? 0 : (playerStrums.members[lane - 1].getMidpoint().x + receptor.getMidpoint().x) * 0.5;
+				var laneRight:Float = lane == playerStrums.length - 1 ? FlxG.width
+					: (receptor.getMidpoint().x + playerStrums.members[lane + 1].getMidpoint().x) * 0.5;
+				if (point.x >= laneLeft && point.x < laneRight && point.y >= FlxG.height * 0.52)
 					touched[lane] = true;
 			}
 			point.put();
