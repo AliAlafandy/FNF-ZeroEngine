@@ -508,6 +508,19 @@ class EditorPlayState extends MusicBeatSubstate
 							oldNote.updateHitbox();
 						}
 
+						#if mobile
+						if (MobileData.mode == 4)
+						{
+							if (sustainNote.mustPress)
+							{
+								sustainNote.x = (FlxG.width - Note.swagWidth * 4) * 0.5
+									+ Note.swagWidth * daNoteData
+									+ (Note.swagWidth - sustainNote.width) * 0.5;
+							}
+							else sustainNote.visible = false;
+						}
+						else
+						#end
 						if (sustainNote.mustPress) sustainNote.x += FlxG.width / 2; // general offset
 						else if(ClientPrefs.data.middleScroll)
 						{
@@ -518,6 +531,19 @@ class EditorPlayState extends MusicBeatSubstate
 					}
 				}
 
+				#if mobile
+				if (MobileData.mode == 4)
+				{
+					if (swagNote.mustPress)
+					{
+						swagNote.x = (FlxG.width - Note.swagWidth * 4) * 0.5
+							+ Note.swagWidth * daNoteData
+							+ (Note.swagWidth - swagNote.width) * 0.5;
+					}
+					else swagNote.visible = false;
+				}
+				else
+				#end
 				if (swagNote.mustPress)
 				{
 					swagNote.x += FlxG.width / 2; // general offset
@@ -548,10 +574,10 @@ class EditorPlayState extends MusicBeatSubstate
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 
 		#if mobile
-		var amplification:Float = (FlxG.width / FlxG.height) / (16 / 9);
-		var playerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * amplification;
-		var playerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * amplification);
-		var opponentScale:Float = 0.4 * amplification;
+		// Match PlayState's mobile layout: normal-sized receptors in four
+		// adjacent lanes, centered at the bottom of the playfield.
+		var mobileLaneWidth:Float = Note.swagWidth;
+		var mobileGroupX:Float = (FlxG.width - mobileLaneWidth * 4) * 0.5;
 		#end
 
 		for (i in 0...4)
@@ -569,9 +595,8 @@ class EditorPlayState extends MusicBeatSubstate
 			#if mobile
 			if (useMobileLayout)
 			{
-				var arrowScale:Float = player == 1 ? playerScale : opponentScale;
-				babyArrow.scale.set(arrowScale, arrowScale);
-				babyArrow.updateHitbox();
+				// Keep both receptor rows visible; only incoming opponent notes
+				// are hidden in mobile mode 4.
 				targetAlpha = 1;
 			}
 			#end
@@ -594,14 +619,11 @@ class EditorPlayState extends MusicBeatSubstate
 			babyArrow.postAddedToGroup();
 
 			#if mobile
-			if (useMobileLayout) {
-				if (player == 1) {
-					babyArrow.x = (FlxG.width - (playerSpacing * 3 + babyArrow.width)) * 0.5 + playerSpacing * i;
-					babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
-				} else {
-					babyArrow.x = 18 + (Note.swagWidth * opponentScale) * i;
-					babyArrow.y = FlxG.height * 0.035;
-				}
+			if (useMobileLayout && player == 1)
+			{
+				// Keep the receptor at its regular, unscaled FNF size.
+				babyArrow.x = mobileGroupX + mobileLaneWidth * i;
+				babyArrow.y = FlxG.height - babyArrow.height - 24;
 			}
 			#end
 		}
@@ -956,14 +978,21 @@ class EditorPlayState extends MusicBeatSubstate
 		var holdArray:Array<Bool> = [];
 		var pressArray:Array<Bool> = [];
 		var releaseArray:Array<Bool> = [];
+		var laneIndex:Int = 0;
 		for (key in keysArray)
 		{
-			holdArray.push(controls.pressed(key));
+			var isHeld:Bool = controls.pressed(key);
+			#if mobile
+			if (MobileData.mode == 4 && laneIndex < mobileStrumTouchState.length)
+				isHeld = isHeld || mobileStrumTouchState[laneIndex];
+			#end
+			holdArray.push(isHeld);
 			if(controls.controllerMode)
 			{
 				pressArray.push(controls.justPressed(key));
 				releaseArray.push(controls.justReleased(key));
 			}
+			laneIndex++;
 		}
 
 		// TO DO: Find a better way to handle controller inputs, this should work for now
