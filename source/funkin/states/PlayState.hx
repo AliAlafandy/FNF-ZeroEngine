@@ -1770,7 +1770,7 @@ class PlayState extends MusicBeatState
 									+ Note.swagWidth * daNoteData
 									+ (Note.swagWidth - sustainNote.width) * 0.5;
 							}
-							else sustainNote.visible = false;
+							else sustainNote.visible = true; // false
 						}
 						else
 						#end
@@ -1942,8 +1942,8 @@ class PlayState extends MusicBeatState
 			if (player == 1) {
 				if(useMobileLayout)
 				{
-					if(i > 5) babyArrow.x += (FlxG.width / 2) + 5;
-					else babyArrow.x += (FlxG.width / 2) - 5;
+					babyArrow.x += (FlxG.width / 2) - 25;
+					if(i > 1) babyArrow.x += (FlxG.width / 2) + 25;
 				}
 				playerStrums.add(babyArrow);
 			} else {
@@ -1961,9 +1961,10 @@ class PlayState extends MusicBeatState
 			#if mobile
 			if (useMobileLayout && player == 1)
 			{
-				// Do not scale the receptors: retain the normal FNF arrow size.
 				babyArrow.x = mobileGroupX + mobileLaneWidth * i;
-				babyArrow.y = FlxG.height - babyArrow.height - 24;
+				babyArrow.y = FlxG.height - babyArrow.height - 84;
+			} else if (useMobileLayout && player != 1) {
+				babyArrow.scale.set(0.6, 0.6);
 			}
 			#end
 		}
