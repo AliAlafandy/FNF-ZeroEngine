@@ -146,7 +146,7 @@ class Main extends Sprite
 			fpsVar.visible = ClientPrefs.data.showFPS;
 		}
 
-		#if mobile
+		#if android
 		updateWaterMark();
 		Lib.current.stage.addEventListener(Event.RESIZE, onWaterMarkResize);
 		#end
