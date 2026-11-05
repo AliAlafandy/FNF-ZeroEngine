@@ -1763,16 +1763,13 @@ class PlayState extends MusicBeatState
 
 						//if (useVSliceHUD) sustainNote.flipY = gottaHitNote;
 						#if mobile
-						if (useVSliceHUD)
+						if (MobileData.mode == 4)
 						{
 							if (sustainNote.mustPress)
 							{
-								var mobileArrowWidth:Float = Note.swagWidth * (1.95 / (16 / 9));
-								var mobileSpacing:Float = Note.swagWidth * (2.8 / (16 / 9));
-								var mobileGroupWidth:Float = mobileSpacing * 3 + mobileArrowWidth;
-								sustainNote.x = (FlxG.width - mobileGroupWidth) * 0.5
-									+ mobileSpacing * daNoteData
-									+ (mobileArrowWidth - sustainNote.width) * 0.5;
+								sustainNote.x = (FlxG.width - Note.swagWidth * 4) * 0.5
+									+ Note.swagWidth * daNoteData
+									+ (Note.swagWidth - sustainNote.width) * 0.5;
 							}
 							else sustainNote.visible = false;
 						}
@@ -1790,16 +1787,13 @@ class PlayState extends MusicBeatState
 
 				//if (useVSliceHUD) swagNote.flipY = gottaHitNote;
 				#if mobile
-				if (useVSliceHUD)
+				if (MobileData.mode == 4)
 				{
 					if (swagNote.mustPress)
 					{
-						var mobileArrowWidth:Float = Note.swagWidth * (1.95 / (16 / 9));
-						var mobileSpacing:Float = Note.swagWidth * (2.8 / (16 / 9));
-						var mobileGroupWidth:Float = mobileSpacing * 3 + mobileArrowWidth;
-						swagNote.x = (FlxG.width - mobileGroupWidth) * 0.5
-							+ mobileSpacing * daNoteData
-							+ (mobileArrowWidth - swagNote.width) * 0.5;
+						swagNote.x = (FlxG.width - Note.swagWidth * 4) * 0.5
+							+ Note.swagWidth * daNoteData
+							+ (Note.swagWidth - swagNote.width) * 0.5;
 					}
 					else swagNote.visible = false;
 				}
@@ -1910,10 +1904,11 @@ class PlayState extends MusicBeatState
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 
 		#if mobile
-		// Match the official FNF mobile layout: four enlarged player
-		// receptors grouped together at the bottom-center of the screen.
-		var mobilePlayerScale:Float = 1.95 / (16 / 9);
-		var mobilePlayerSpacing:Float = Note.swagWidth * (2.8 / (16 / 9));
+		// Original mobile-style receptors: standard size, four adjacent lanes,
+		// centered at the bottom of the playfield.
+		var mobileLaneWidth:Float = Note.swagWidth;
+		var mobileGroupWidth:Float = mobileLaneWidth * 4;
+		var mobileGroupX:Float = (FlxG.width - mobileGroupWidth) * 0.5;
 		#end
 
 		for (i in 0...4)
@@ -1931,9 +1926,9 @@ class PlayState extends MusicBeatState
 			#if mobile
 			if (useMobileLayout)
 			{
-				// Opponent receptors stay available for their note animations,
-				// but are not drawn in the mobile playfield.
-				targetAlpha = player == 1 ? 1 : 0;
+				// Keep both receptor rows visible; only incoming opponent notes
+				// are hidden in the mobile layout.
+				targetAlpha = 1;
 			}
 			#end
 
@@ -1964,21 +1959,11 @@ class PlayState extends MusicBeatState
 			babyArrow.postAddedToGroup();
 
 			#if mobile
-			if (useMobileLayout)
+			if (useMobileLayout && player == 1)
 			{
-				if (player == 1)
-				{
-					babyArrow.scale.set(mobilePlayerScale, mobilePlayerScale);
-					babyArrow.updateHitbox();
-					babyArrow.x = (FlxG.width - (mobilePlayerSpacing * 3 + babyArrow.width)) * 0.5
-						+ mobilePlayerSpacing * i;
-					babyArrow.y = FlxG.height - babyArrow.height - 24;
-				}
-				else
-				{
-					babyArrow.visible = false;
-					babyArrow.alpha = 0;
-				}
+				// Do not scale the receptors: retain the normal FNF arrow size.
+				babyArrow.x = mobileGroupX + mobileLaneWidth * i;
+				babyArrow.y = FlxG.height - babyArrow.height - 24;
 			}
 			#end
 		}
