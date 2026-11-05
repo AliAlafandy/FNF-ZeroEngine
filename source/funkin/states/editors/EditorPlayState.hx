@@ -517,7 +517,7 @@ class EditorPlayState extends MusicBeatSubstate
 									+ Note.swagWidth * daNoteData
 									+ (Note.swagWidth - sustainNote.width) * 0.5;
 							}
-							else sustainNote.visible = false;
+							else sustainNote.visible = true; // false
 						}
 						else
 						#end
@@ -540,7 +540,7 @@ class EditorPlayState extends MusicBeatSubstate
 							+ Note.swagWidth * daNoteData
 							+ (Note.swagWidth - swagNote.width) * 0.5;
 					}
-					else swagNote.visible = false;
+					else swagNote.visible = true; // false
 				}
 				else
 				#end
@@ -574,8 +574,6 @@ class EditorPlayState extends MusicBeatSubstate
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 
 		#if mobile
-		// Match PlayState's mobile layout: normal-sized receptors in four
-		// adjacent lanes, centered at the bottom of the playfield.
 		var mobileLaneWidth:Float = Note.swagWidth;
 		var mobileGroupX:Float = (FlxG.width - mobileLaneWidth * 4) * 0.5;
 		#end
@@ -604,6 +602,11 @@ class EditorPlayState extends MusicBeatSubstate
 			babyArrow.alpha = targetAlpha;
 
 			if (player == 1)
+				if(useMobileLayout)
+				{
+					babyArrow.x += (FlxG.width / 2) + 25;
+					if(i > 1) babyArrow.x += (FlxG.width / 2) - 25;
+				}
 				playerStrums.add(babyArrow);
 			else
 			{
@@ -623,7 +626,9 @@ class EditorPlayState extends MusicBeatSubstate
 			{
 				// Keep the receptor at its regular, unscaled FNF size.
 				babyArrow.x = mobileGroupX + mobileLaneWidth * i;
-				babyArrow.y = FlxG.height - babyArrow.height - 24;
+				babyArrow.y = FlxG.height - babyArrow.height - 84;
+			} else if (useMobileLayout && player != 1) {
+				babyArrow.scale.set(0.6, 0.6);
 			}
 			#end
 		}
