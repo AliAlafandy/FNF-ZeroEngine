@@ -109,8 +109,8 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			"If checked, it will add water mark like icon.",
 			'waterMark',
 			'bool');
-		option.onChange = onChangeFPSCounter();
 		addOption(option);
+		option.onChange = onChangeWaterMark;
 
 		option = new Option('Water Mark Style:',
 			"What should the Water Mark style?",
@@ -145,7 +145,7 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			trace('Failed to remove last directory. (${e.message})');
 	}
 
-	function onChangeFPSCounter():Void
+	function onChangeWaterMark()
 	{
 		if(Main.waterMark != null)
 			Main.waterMark.visible = ClientPrefs.data.waterMark;
