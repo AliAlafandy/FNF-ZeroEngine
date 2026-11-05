@@ -10,17 +10,19 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		rpcTitle = 'Gameplay Settings Menu'; //for Discord Rich Presence
 
 		//I'd suggest using "Downscroll" as an example for making your own option since it is the simplest here
-		var option:Option = new Option('Downscroll', //Name
-			'If checked, notes go Down instead of Up, simple enough.', //Description
-			'downScroll', //Save data variable name
-			'bool'); //Variable type
-		addOption(option);
+		if (FlxG.onMobile && MobileData.mode != 4) {
+			var option:Option = new Option('Downscroll', //Name
+				'If checked, notes go Down instead of Up, simple enough.', //Description
+				'downScroll', //Save data variable name
+				'bool'); //Variable type
+			addOption(option);
 
-		var option:Option = new Option('Middlescroll',
-			'If checked, your notes get centered.',
-			'middleScroll',
-			'bool');
-		addOption(option);
+			var option:Option = new Option('Middlescroll',
+				'If checked, your notes get centered.',
+				'middleScroll',
+				'bool');
+			addOption(option);
+		}
 
 		var option:Option = new Option('Opponent Notes',
 			'If unchecked, opponent notes get hidden.',
