@@ -1761,7 +1761,6 @@ class PlayState extends MusicBeatState
 							oldNote.updateHitbox();
 						}
 
-						//if (useVSliceHUD) sustainNote.flipY = gottaHitNote;
 						#if mobile
 						if (MobileData.mode == 4)
 						{
@@ -1775,6 +1774,7 @@ class PlayState extends MusicBeatState
 						}
 						else
 						#end
+
 						if (sustainNote.mustPress) sustainNote.x += FlxG.width / 2; // general offset
 						else if(ClientPrefs.data.middleScroll && !useVSliceHUD)
 						{
@@ -1785,7 +1785,6 @@ class PlayState extends MusicBeatState
 					}
 				}
 
-				//if (useVSliceHUD) swagNote.flipY = gottaHitNote;
 				#if mobile
 				if (MobileData.mode == 4)
 				{
@@ -1799,6 +1798,7 @@ class PlayState extends MusicBeatState
 				}
 				else
 				#end
+
 				if (swagNote.mustPress)
 				{
 					swagNote.x += FlxG.width / 2; // general offset
