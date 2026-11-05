@@ -1629,6 +1629,7 @@ class PlayState extends MusicBeatState
 		#else
 		var useVSliceHUD:Bool = false;
 		#end
+
 		// FlxG.log.add(ChartParser.parse());
 		songSpeed = PlayState.SONG.speed;
 		songSpeedType = ClientPrefs.getGameplaySetting('scrolltype');
@@ -1770,7 +1771,7 @@ class PlayState extends MusicBeatState
 									+ Note.swagWidth * daNoteData
 									+ (Note.swagWidth - sustainNote.width) * 0.5;
 							}
-							else sustainNote.visible = true; // false
+							else sustainNote.visible = false;
 						}
 						else
 						#end
@@ -1904,8 +1905,6 @@ class PlayState extends MusicBeatState
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 
 		#if mobile
-		// Original mobile-style receptors: standard size, four adjacent lanes,
-		// centered at the bottom of the playfield.
 		var mobileLaneWidth:Float = Note.swagWidth;
 		var mobileGroupWidth:Float = mobileLaneWidth * 4;
 		var mobileGroupX:Float = (FlxG.width - mobileGroupWidth) * 0.5;
@@ -1942,8 +1941,8 @@ class PlayState extends MusicBeatState
 			if (player == 1) {
 				if(useMobileLayout)
 				{
-					babyArrow.x += (FlxG.width / 2) - 25;
-					if(i > 1) babyArrow.x += (FlxG.width / 2) + 25;
+					babyArrow.x += 310;
+					if(i > 5) babyArrow.x += (FlxG.width / 2) + 25;
 				}
 				playerStrums.add(babyArrow);
 			} else {
@@ -1962,9 +1961,9 @@ class PlayState extends MusicBeatState
 			if (useMobileLayout && player == 1)
 			{
 				babyArrow.x = mobileGroupX + mobileLaneWidth * i;
-				babyArrow.y = FlxG.height - babyArrow.height - 84;
-			} else if (useMobileLayout && player != 1) {
-				babyArrow.scale.set(0.6, 0.6);
+				babyArrow.y = FlxG.height - babyArrow.height - 124;
+			} else if (useMobileLayout && player < 1) {
+				babyArrow.scale.set(0.4, 0.4);
 			}
 			#end
 		}
