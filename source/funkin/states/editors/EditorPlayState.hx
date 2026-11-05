@@ -602,14 +602,14 @@ class EditorPlayState extends MusicBeatSubstate
 			babyArrow.alpha = targetAlpha;
 
 			if (player == 1)
+			{
 				if(useMobileLayout)
 				{
 					babyArrow.x += (FlxG.width / 2) - 25;
 					if(i > 1) babyArrow.x += (FlxG.width / 2) + 25;
 				}
 				playerStrums.add(babyArrow);
-			else
-			{
+			} else {
 				if(ClientPrefs.data.middleScroll && !useMobileLayout)
 				{
 					babyArrow.x += 310;
