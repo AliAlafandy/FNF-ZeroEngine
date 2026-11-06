@@ -513,10 +513,8 @@ class EditorPlayState extends MusicBeatSubstate
 						{
 							if (sustainNote.mustPress)
 							{
-								var mobileNoteLaneX:Float = daNoteData < 2
-									? mobileLeftPairX + mobileLaneWidth * daNoteData
-									: mobileRightPairX + mobileLaneWidth * (daNoteData - 2);
-								sustainNote.x = mobileNoteLaneX + (mobileLaneWidth - sustainNote.width) * 0.5;
+								var mobileNoteLaneX:Float = mobilePlayerLaneX(daNoteData);
+								sustainNote.x = mobileNoteLaneX + (Note.swagWidth * mobilePlayerArrowScale() - sustainNote.width) * 0.5;
 							}
 							else sustainNote.visible = false;
 						}
@@ -537,10 +535,8 @@ class EditorPlayState extends MusicBeatSubstate
 				{
 					if (swagNote.mustPress)
 					{
-						var mobileNoteLaneX:Float = daNoteData < 2
-							? mobileLeftPairX + mobileLaneWidth * daNoteData
-							: mobileRightPairX + mobileLaneWidth * (daNoteData - 2);
-						swagNote.x = mobileNoteLaneX + (mobileLaneWidth - swagNote.width) * 0.5;
+						var mobileNoteLaneX:Float = mobilePlayerLaneX(daNoteData);
+						swagNote.x = mobileNoteLaneX + (Note.swagWidth * mobilePlayerArrowScale() - swagNote.width) * 0.5;
 					}
 					else swagNote.visible = false;
 				}
@@ -564,6 +560,35 @@ class EditorPlayState extends MusicBeatSubstate
 		unspawnNotes.sort(PlayState.sortByTime);
 	}
 	
+	#if mobile
+	/**
+	 * FNF Mobile mode 4 layout helpers. Keep receptors and incoming player notes
+	 * on exactly the same lane positions.
+	 */
+	private inline function mobileLayoutAmplification():Float
+	{
+		return (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+	}
+
+	private inline function mobilePlayerArrowScale():Float
+	{
+		return (FlxG.height / FlxG.width) * 1.95 * mobileLayoutAmplification();
+	}
+
+	private inline function mobilePlayerLaneSpacing():Float
+	{
+		return Note.swagWidth * ((FlxG.height / FlxG.width) * 2.8 * mobileLayoutAmplification());
+	}
+
+	private inline function mobilePlayerLaneX(lane:Int):Float
+	{
+		var arrowWidth:Float = Note.swagWidth * mobilePlayerArrowScale();
+		var spacing:Float = mobilePlayerLaneSpacing();
+		var groupWidth:Float = arrowWidth + spacing * 3;
+		return (FlxG.width - groupWidth) * 0.5 + spacing * lane;
+	}
+	#end
+
 	private function generateStaticArrows(player:Int):Void
 	{
 		#if mobile
@@ -576,11 +601,7 @@ class EditorPlayState extends MusicBeatSubstate
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 
 		#if mobile
-		// Normal-size player receptors split into two pairs:
-		// Left/Down on the left edge, Up/Right on the right edge.
-		var mobileLaneWidth:Float = Note.swagWidth;
-		var mobileLeftPairX:Float = FlxG.width * 0.06;
-		var mobileRightPairX:Float = FlxG.width * 0.94 - mobileLaneWidth * 2;
+		var mobileAmplification:Float = mobileLayoutAmplification();
 		#end
 
 		for (i in 0...4)
@@ -629,22 +650,21 @@ class EditorPlayState extends MusicBeatSubstate
 			#if mobile
 			if (useMobileLayout && player == 1)
 			{
-				// Keep normal receptor size and split the lanes into two side pairs.
-				babyArrow.scale.set(1, 1);
+				// Official FNF Mobile: enlarged, evenly spaced, bottom-centered row.
+				var playerScale:Float = mobilePlayerArrowScale();
+				babyArrow.scale.set(playerScale, playerScale);
 				babyArrow.updateHitbox();
-				babyArrow.x = i < 2
-					? mobileLeftPairX + mobileLaneWidth * i
-					: mobileRightPairX + mobileLaneWidth * (i - 2);
-				babyArrow.y = FlxG.height - babyArrow.height - 24;
+				babyArrow.x = mobilePlayerLaneX(i);
+				babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
 			}
 			else if (useMobileLayout && player < 1)
 			{
-				// Mini opponent receptors sit at the upper-left beside the health bar.
-				var opponentScale:Float = 0.4;
+				// Compact opponent receptors at the upper-left beside the health bar.
+				var opponentScale:Float = 0.4 * mobileAmplification;
 				babyArrow.scale.set(opponentScale, opponentScale);
 				babyArrow.updateHitbox();
 				babyArrow.x = 12 + babyArrow.width * i;
-				babyArrow.y = 58;
+				babyArrow.y = FlxG.height * 0.025;
 			}
 			#end
 		}
@@ -966,10 +986,6 @@ class EditorPlayState extends MusicBeatSubstate
 				// Only the intended pairs share touch space:
 				// Left + Down (0/1) and Up + Right (2/3).
 				// The Down + Up boundary stays separate.
-				if (lane == 1 || lane == 3) laneLeft -= pairOverlap;
-				if (lane == 0 || lane == 2) laneRight += pairOverlap;
-				// Share only Left/Down (0/1) and Up/Right (2/3).
-				// The Down/Up boundary remains separate.
 				if (lane == 1 || lane == 3) laneLeft -= pairOverlap;
 				if (lane == 0 || lane == 2) laneRight += pairOverlap;
 				var laneTop:Float = receptor.y - receptor.height * 0.35;
