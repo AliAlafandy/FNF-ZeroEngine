@@ -953,6 +953,11 @@ class EditorPlayState extends MusicBeatSubstate
 				var pairOverlap:Float = laneGap * 0.5 + 8;
 				var laneLeft:Float = receptor.x;
 				var laneRight:Float = receptor.x + receptor.width;
+				// Only the intended pairs share touch space:
+				// Left + Down (0/1) and Up + Right (2/3).
+				// The Down + Up boundary stays separate.
+				if (lane == 1 || lane == 3) laneLeft -= pairOverlap;
+				if (lane == 0 || lane == 2) laneRight += pairOverlap;
 				// Share only Left/Down (0/1) and Up/Right (2/3).
 				// The Down/Up boundary remains separate.
 				if (lane == 1 || lane == 3) laneLeft -= pairOverlap;
