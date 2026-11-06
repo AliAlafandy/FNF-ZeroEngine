@@ -93,11 +93,16 @@ class TouchPad extends MobileInputManager implements IMobileControls
 		switch (Extra)
 		{
 			case SINGLE:
-				add(buttonExtra = createButton(0, FlxG.height - 137, 's', 0xFF0066FF));
+				// Place the single extra action in the open center area.
+				add(buttonExtra = createButton((FlxG.width - 132) * 0.5, (FlxG.height - 132) * 0.5, 's', 0xFF0066FF));
 				setExtrasPos();
 			case DOUBLE:
-				add(buttonExtra = createButton(0, FlxG.height - 137, 's', 0xFF0066FF));
-				add(buttonExtra2 = createButton(BASE_SCREEN_WIDTH - 132, FlxG.height - 137, 'g', 0xA6FF00));
+				// Keep both extra actions together, side-by-side at screen center.
+				var extraGap:Float = 18;
+				var extraStartX:Float = (FlxG.width - (132 * 2 + extraGap)) * 0.5;
+				var extraY:Float = (FlxG.height - 132) * 0.5;
+				add(buttonExtra = createButton(extraStartX, extraY, 's', 0xFF0066FF));
+				add(buttonExtra2 = createButton(extraStartX + 132 + extraGap, extraY, 'g', 0xA6FF00));
 				setExtrasPos();
 			case NONE: // nothing
 		}
