@@ -60,7 +60,7 @@ class EditorPlayState extends MusicBeatSubstate
 
 	#if mobile
 	private var mobileStrumTouchState:Array<Bool> = [false, false, false, false];
-	private var mobileExtraButtons:MobileInputManager;
+	public var mobileExtraButtons:MobileInputManager;
 	private var mobileExtraButtonMode:String = '';
 	#end
 	
@@ -957,13 +957,7 @@ class EditorPlayState extends MusicBeatSubstate
 
 		var firstStrum:StrumNote = (playerStrums != null && playerStrums.length > 0) ? playerStrums.members[0] : null;
 		var buttonY:Float = FlxG.height * 0.43;
-		if (false && firstStrum != null)
-		{
-			var gapTop:Float = healthBar.y + healthBar.height + 8;
-			var gapBottom:Float = firstStrum.y - 8;
-			buttonY = gapTop + Math.max(0, gapBottom - gapTop - mobileExtraButtons.members[0].height) * 0.5;
-		}
-		else if (firstStrum != null)
+		if (firstStrum != null)
 			buttonY = (FlxG.height * 0.25 + firstStrum.y - mobileExtraButtons.members[0].height) * 0.5;
 
 		var count:Int = mobileExtraButtons.length;
