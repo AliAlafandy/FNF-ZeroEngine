@@ -561,17 +561,6 @@ class EditorPlayState extends MusicBeatSubstate
 	}
 	
 	#if mobile
-	/**
-	 * Standard-size FNF Mobile player row: four evenly spaced receptors,
-	 * centered horizontally. Notes use this same lane calculation.
-	 */
-	private inline function mobilePlayerArrowScale():Float
-	{
-		// The source receptor graphic is larger than the original mobile HUD.
-		// Scale it down while keeping note lanes aligned to the same centers.
-		return 0.65;
-	}
-
 	private inline function mobilePlayerLaneX(lane:Int):Float
 	{
 		var spacing:Float = Note.swagWidth;
@@ -591,7 +580,6 @@ class EditorPlayState extends MusicBeatSubstate
 		var strumLineX:Float = useMobileLayout ? 0 : (ClientPrefs.data.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X);
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 
-
 		for (i in 0...4)
 		{
 			var targetAlpha:Float = 1;
@@ -605,23 +593,12 @@ class EditorPlayState extends MusicBeatSubstate
 			babyArrow.downScroll = useMobileLayout ? player == 1 : ClientPrefs.data.downScroll;
 
 			#if mobile
-			if (useMobileLayout)
-			{
-				// Keep both receptor rows visible; only incoming opponent notes
-				// are hidden in mobile mode 4.
-				targetAlpha = 1;
-			}
+			if (useMobileLayout) targetAlpha = 1;
 			#end
 
 			babyArrow.alpha = targetAlpha;
 
-			if (player == 1)
-			{
-				if(useMobileLayout)
-				{
-					babyArrow.x += (FlxG.width / 2) - 25;
-					if(i > 1) babyArrow.x += (FlxG.width / 2) + 25;
-				}
+			if (player == 1) {
 				playerStrums.add(babyArrow);
 			} else {
 				if(ClientPrefs.data.middleScroll && !useMobileLayout)
@@ -638,24 +615,19 @@ class EditorPlayState extends MusicBeatSubstate
 			#if mobile
 			if (useMobileLayout && player == 1)
 			{
-				// Standard-size, evenly spaced player receptors centered at the bottom.
-				babyArrow.scale.set(mobilePlayerArrowScale(), mobilePlayerArrowScale());
 				babyArrow.updateHitbox();
 				babyArrow.x = mobilePlayerLaneX(i);
-				babyArrow.y = FlxG.height - babyArrow.height - 32;
-			}
-			else if (useMobileLayout && player < 1)
-			{
-				// Compact opponent receptors in a tidy row at the upper-left.
+				babyArrow.y = FlxG.height - babyArrow.height - 124;
+			} else if (useMobileLayout && player < 1) {
 				babyArrow.scale.set(0.4, 0.4);
 				babyArrow.updateHitbox();
 				babyArrow.x = 12 + (babyArrow.width + 8) * i;
-				// Keep receptors below the FPS/version overlay.
 				babyArrow.y = 64;
 			}
 			#end
 		}
 	}
+
 	public function finishSong():Void
 	{
 		if(ClientPrefs.data.noteOffset <= 0) {
