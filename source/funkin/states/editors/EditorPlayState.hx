@@ -513,16 +513,10 @@ class EditorPlayState extends MusicBeatSubstate
 						{
 							if (sustainNote.mustPress)
 							{
-								#if mobile
-								var mobileAmplification:Float = (FlxG.width / FlxG.height) / (16 / 9);
-								var mobilePlayerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * mobileAmplification;
-								var mobilePlayerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * mobileAmplification);
-								var mobilePlayerArrowWidth:Float = Note.swagWidth * mobilePlayerScale;
-								var mobileGroupWidth:Float = mobilePlayerArrowWidth + mobilePlayerSpacing * 3;
-								var mobileGroupX:Float = (FlxG.width - mobileGroupWidth) * 0.5;
-								#end
-								sustainNote.x = mobileGroupX + mobilePlayerSpacing * daNoteData
-									+ (mobilePlayerArrowWidth - sustainNote.width) * 0.5;
+								var mobileNoteLaneX:Float = daNoteData < 2
+									? mobileLeftPairX + mobileLaneWidth * daNoteData
+									: mobileRightPairX + mobileLaneWidth * (daNoteData - 2);
+								sustainNote.x = mobileNoteLaneX + (mobileLaneWidth - sustainNote.width) * 0.5;
 							}
 							else sustainNote.visible = false;
 						}
@@ -543,16 +537,10 @@ class EditorPlayState extends MusicBeatSubstate
 				{
 					if (swagNote.mustPress)
 					{
-						#if mobile
-						var mobileAmplification:Float = (FlxG.width / FlxG.height) / (16 / 9);
-								var mobilePlayerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * mobileAmplification;
-								var mobilePlayerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * mobileAmplification);
-								var mobilePlayerArrowWidth:Float = Note.swagWidth * mobilePlayerScale;
-								var mobileGroupWidth:Float = mobilePlayerArrowWidth + mobilePlayerSpacing * 3;
-								var mobileGroupX:Float = (FlxG.width - mobileGroupWidth) * 0.5;
-								#end
-						swagNote.x = mobileGroupX + mobilePlayerSpacing * daNoteData
-							+ (mobilePlayerArrowWidth - swagNote.width) * 0.5;
+						var mobileNoteLaneX:Float = daNoteData < 2
+							? mobileLeftPairX + mobileLaneWidth * daNoteData
+							: mobileRightPairX + mobileLaneWidth * (daNoteData - 2);
+						swagNote.x = mobileNoteLaneX + (mobileLaneWidth - swagNote.width) * 0.5;
 					}
 					else swagNote.visible = false;
 				}
@@ -588,14 +576,11 @@ class EditorPlayState extends MusicBeatSubstate
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 
 		#if mobile
-		// Official FNF mobile proportions: larger player receptors and
-		// wider lane spacing, with a compact opponent row at upper-left.
-		var mobileAmplification:Float = (FlxG.width / FlxG.height) / (16 / 9);
-		var mobilePlayerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * mobileAmplification;
-		var mobilePlayerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * mobileAmplification);
-		var mobilePlayerArrowWidth:Float = Note.swagWidth * mobilePlayerScale;
-		var mobileGroupWidth:Float = mobilePlayerArrowWidth + mobilePlayerSpacing * 3;
-		var mobileGroupX:Float = (FlxG.width - mobileGroupWidth) * 0.5;
+		// Normal-size player receptors split into two pairs:
+		// Left/Down on the left edge, Up/Right on the right edge.
+		var mobileLaneWidth:Float = Note.swagWidth;
+		var mobileLeftPairX:Float = FlxG.width * 0.06;
+		var mobileRightPairX:Float = FlxG.width * 0.94 - mobileLaneWidth * 2;
 		#end
 
 		for (i in 0...4)
@@ -644,16 +629,18 @@ class EditorPlayState extends MusicBeatSubstate
 			#if mobile
 			if (useMobileLayout && player == 1)
 			{
-				// Enlarged player receptors, spaced and centered near the bottom.
-				babyArrow.scale.set(mobilePlayerScale, mobilePlayerScale);
+				// Keep normal receptor size and split the lanes into two side pairs.
+				babyArrow.scale.set(1, 1);
 				babyArrow.updateHitbox();
-				babyArrow.x = mobileGroupX + mobilePlayerSpacing * i;
-				babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
+				babyArrow.x = i < 2
+					? mobileLeftPairX + mobileLaneWidth * i
+					: mobileRightPairX + mobileLaneWidth * (i - 2);
+				babyArrow.y = FlxG.height - babyArrow.height - 24;
 			}
 			else if (useMobileLayout && player < 1)
 			{
 				// Mini opponent receptors sit at the upper-left beside the health bar.
-				var opponentScale:Float = 0.4 * mobileAmplification;
+				var opponentScale:Float = 0.4;
 				babyArrow.scale.set(opponentScale, opponentScale);
 				babyArrow.updateHitbox();
 				babyArrow.x = 12 + babyArrow.width * i;
