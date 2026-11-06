@@ -3304,7 +3304,7 @@ class PlayState extends MusicBeatState
 
 	#if mobile
 	private var mobileStrumTouchState:Array<Bool> = [false, false, false, false];
-	private var mobileExtraButtons:MobileInputManager;
+	public var mobileExtraButtons:MobileInputManager;
 	private var mobileExtraButtonMode:String = '';
 
 
