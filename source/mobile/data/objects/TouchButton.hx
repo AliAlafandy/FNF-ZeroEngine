@@ -332,7 +332,7 @@ class TypedTouchButton<T:FlxSprite> extends FlxSprite implements IFlxInput
 		}
 	}
 
-	function updateLabelPosition()
+	public function updateLabelPosition()
 	{
 		if (_spriteLabel != null)
 		{
@@ -347,7 +347,7 @@ class TypedTouchButton<T:FlxSprite> extends FlxSprite implements IFlxInput
 			_spriteLabel.scale.set(scale.x, scale.y);
 	}
 
-	function indicateStatus()
+	public function indicateStatus()
 	{
 		switch (statusIndicatorType)
 		{
