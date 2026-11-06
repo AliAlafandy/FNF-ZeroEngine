@@ -946,7 +946,11 @@ class EditorPlayState extends MusicBeatSubstate
 				// Match the broad, thumb-friendly FNF Mobile lane hit areas.
 				// Keep the touch target close to the actual receptor instead
 				// of treating the entire screen half as a lane.
-				var hitPadding:Float = receptor.width * 0.18;
+				// Extend each hit area to the midpoint between adjacent lanes,
+				// plus a small overlap. Touching the gap can then activate both
+				// neighboring directions (e.g. Left + Down).
+				var laneGap:Float = Math.max(0, Note.swagWidth - receptor.width);
+				var hitPadding:Float = laneGap * 0.5 + 8;
 				var laneLeft:Float = receptor.x - hitPadding;
 				var laneRight:Float = receptor.x + receptor.width + hitPadding;
 				var laneTop:Float = receptor.y - receptor.height * 0.35;
