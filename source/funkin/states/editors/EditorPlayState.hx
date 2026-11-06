@@ -4,6 +4,9 @@ import funkin.data.backend.Song;
 import funkin.data.backend.Section;
 import funkin.data.backend.Rating;
 import mobile.data.backend.MobileData;
+import mobile.data.objects.TouchButton;
+import mobile.input.MobileInputID;
+import mobile.input.MobileInputManager;
 
 import funkin.data.objects.Note;
 import funkin.data.objects.NoteSplash;
@@ -57,6 +60,8 @@ class EditorPlayState extends MusicBeatSubstate
 
 	#if mobile
 	private var mobileStrumTouchState:Array<Bool> = [false, false, false, false];
+	private var mobileExtraButtons:MobileInputManager;
+	private var mobileExtraButtonMode:String = '';
 	#end
 	
 	var songHits:Int = 0;
@@ -917,8 +922,87 @@ class EditorPlayState extends MusicBeatSubstate
 	}
 
 	#if mobile
+
+	private function updateOfficialExtraButtons():Void
+	{
+		if (MobileData.mode != 4 || ClientPrefs.data.extraButtons == 'NONE')
+		{
+			if (mobileExtraButtons != null)
+			{
+				remove(mobileExtraButtons, true);
+				mobileExtraButtons.destroy();
+				mobileExtraButtons = null;
+				mobileExtraButtonMode = '';
+			}
+			return;
+		}
+
+		if (mobileExtraButtons == null || mobileExtraButtonMode != ClientPrefs.data.extraButtons)
+		{
+			if (mobileExtraButtons != null)
+			{
+				remove(mobileExtraButtons, true);
+				mobileExtraButtons.destroy();
+			}
+			mobileExtraButtons = new MobileInputManager();
+			mobileExtraButtonMode = ClientPrefs.data.extraButtons;
+			createOfficialExtraButton(MobileInputID.EXTRA_1, 'S', 0xFF0066FF);
+			if (mobileExtraButtonMode == 'DOUBLE')
+				createOfficialExtraButton(MobileInputID.EXTRA_2, 'G', 0xFFA6FF00);
+			mobileExtraButtons.updateTrackedButtons();
+			mobileExtraButtons.cameras = [FlxG.camera];
+			mobileExtraButtons.scrollFactor.set();
+			add(mobileExtraButtons);
+		}
+
+		var firstStrum:StrumNote = (playerStrums != null && playerStrums.length > 0) ? playerStrums.members[0] : null;
+		var buttonY:Float = FlxG.height * 0.43;
+		if (false && firstStrum != null)
+		{
+			var gapTop:Float = healthBar.y + healthBar.height + 8;
+			var gapBottom:Float = firstStrum.y - 8;
+			buttonY = gapTop + Math.max(0, gapBottom - gapTop - mobileExtraButtons.members[0].height) * 0.5;
+		}
+		else if (firstStrum != null)
+			buttonY = (FlxG.height * 0.25 + firstStrum.y - mobileExtraButtons.members[0].height) * 0.5;
+
+		var count:Int = mobileExtraButtons.length;
+		var buttonWidth:Float = mobileExtraButtons.members[0].width;
+		var spacing:Float = 16;
+		var totalWidth:Float = count * buttonWidth + (count - 1) * spacing;
+		var startX:Float = (FlxG.width - totalWidth) * 0.5;
+		for (i in 0...count)
+			mobileExtraButtons.members[i].setPosition(startX + i * (buttonWidth + spacing), buttonY);
+	}
+
+	private function createOfficialExtraButton(id:MobileInputID, graphic:String, tint:FlxColor):Void
+	{
+		var button:TouchButton = new TouchButton(0, 0, [id]);
+		button.label = new FlxSprite();
+		button.loadGraphic(Paths.image('touchpad/bg', 'mobile'));
+		button.label.loadGraphic(Paths.image('touchpad/' + graphic, 'mobile'));
+		button.scale.set(0.243, 0.243);
+		button.updateHitbox();
+		button.updateLabelPosition();
+		button.statusBrightness = [1, 0.8, 0.4];
+		button.statusIndicatorType = BRIGHTNESS;
+		button.indicateStatus();
+		button.label.antialiasing = button.antialiasing = ClientPrefs.data.antialiasing;
+		button.color = tint;
+		button.parentAlpha = ClientPrefs.data.controlsAlpha;
+		button.onDown.callback = function()
+		{
+
+		};
+		button.onOut.callback = button.onUp.callback = function()
+		{
+
+		};
+		mobileExtraButtons.add(button);
+	}
 	private function updateMobileStrums():Void
 	{
+		updateOfficialExtraButtons();
 		if (MobileData.mode != 4)
 		{
 			for (lane in 0...4)
