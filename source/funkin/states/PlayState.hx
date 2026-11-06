@@ -3318,10 +3318,16 @@ class PlayState extends MusicBeatState
 					var receptor:StrumNote = playerStrums.members[lane];
 					if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
 
-					var laneLeft:Float = lane == 0 ? 0 : ((playerStrums.members[lane - 1].x + playerStrums.members[lane - 1].width * 0.5) + (receptor.x + receptor.width * 0.5)) * 0.5;
-					var laneRight:Float = lane == playerStrums.length - 1 ? FlxG.width
-						: ((receptor.x + receptor.width * 0.5) + (playerStrums.members[lane + 1].x + playerStrums.members[lane + 1].width * 0.5)) * 0.5;
-				if (touchPoint.x >= laneLeft && touchPoint.x < laneRight && touchPoint.y >= FlxG.height * 0.52)
+					// Restrict each touch lane to the receptor's own hit area.
+					// Do not extend the first/last lanes to the screen edges:
+					// touches away from the arrows must not trigger notes.
+					var hitPadding:Float = receptor.width * 0.18;
+					var laneLeft:Float = receptor.x - hitPadding;
+					var laneRight:Float = receptor.x + receptor.width + hitPadding;
+					var laneTop:Float = receptor.y - receptor.height * 0.35;
+					var laneBottom:Float = FlxG.height;
+				if (touchPoint.x >= laneLeft && touchPoint.x <= laneRight
+					&& touchPoint.y >= laneTop && touchPoint.y <= laneBottom)
 					touched[lane] = true;
 				}
 				touchPoint.put();
