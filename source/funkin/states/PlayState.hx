@@ -3332,9 +3332,13 @@ class PlayState extends MusicBeatState
 				// plus a small overlap. Touching the gap can then activate both
 				// neighboring directions (e.g. Left + Down).
 				var laneGap:Float = Math.max(0, Note.swagWidth - receptor.width);
-				var hitPadding:Float = laneGap * 0.5 + 8;
-					var laneLeft:Float = receptor.x - hitPadding;
-					var laneRight:Float = receptor.x + receptor.width + hitPadding;
+				var pairOverlap:Float = laneGap * 0.5 + 8;
+				var laneLeft:Float = receptor.x;
+				var laneRight:Float = receptor.x + receptor.width;
+				// Share only Left/Down (0/1) and Up/Right (2/3).
+				// The Down/Up boundary remains separate.
+				if (lane == 1 || lane == 3) laneLeft -= pairOverlap;
+				if (lane == 0 || lane == 2) laneRight += pairOverlap;
 					var laneTop:Float = receptor.y - receptor.height * 0.35;
 					var laneBottom:Float = receptor.y + receptor.height * 1.35;
 				if (touchPoint.x >= laneLeft && touchPoint.x <= laneRight
