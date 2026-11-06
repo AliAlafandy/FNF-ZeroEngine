@@ -1767,6 +1767,14 @@ class PlayState extends MusicBeatState
 						{
 							if (sustainNote.mustPress)
 							{
+								#if mobile
+								var mobileAmplification:Float = (FlxG.width / FlxG.height) / (16 / 9);
+								var mobilePlayerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * mobileAmplification;
+								var mobilePlayerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * mobileAmplification);
+								var mobilePlayerArrowWidth:Float = Note.swagWidth * mobilePlayerScale;
+								var mobileGroupWidth:Float = mobilePlayerArrowWidth + mobilePlayerSpacing * 3;
+								var mobileGroupX:Float = (FlxG.width - mobileGroupWidth) * 0.5;
+								#end
 								sustainNote.x = mobileGroupX + mobilePlayerSpacing * daNoteData
 									+ (mobilePlayerArrowWidth - sustainNote.width) * 0.5;
 							}
@@ -1790,6 +1798,14 @@ class PlayState extends MusicBeatState
 				{
 					if (swagNote.mustPress)
 					{
+						#if mobile
+						var mobileAmplification:Float = (FlxG.width / FlxG.height) / (16 / 9);
+								var mobilePlayerScale:Float = ((FlxG.height / FlxG.width) * 1.95) * mobileAmplification;
+								var mobilePlayerSpacing:Float = Note.swagWidth * (((FlxG.height / FlxG.width) * 2.8) * mobileAmplification);
+								var mobilePlayerArrowWidth:Float = Note.swagWidth * mobilePlayerScale;
+								var mobileGroupWidth:Float = mobilePlayerArrowWidth + mobilePlayerSpacing * 3;
+								var mobileGroupX:Float = (FlxG.width - mobileGroupWidth) * 0.5;
+								#end
 						swagNote.x = mobileGroupX + mobilePlayerSpacing * daNoteData
 							+ (mobilePlayerArrowWidth - swagNote.width) * 0.5;
 					}
