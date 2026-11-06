@@ -1960,10 +1960,17 @@ class PlayState extends MusicBeatState
 			#if mobile
 			if (useMobileLayout && player == 1)
 			{
+				// Standard-size player receptors, centered along the bottom.
 				babyArrow.x = mobileGroupX + mobileLaneWidth * i;
-				babyArrow.y = FlxG.height - babyArrow.height - 124;
-			} else if (useMobileLayout && player < 1) {
+				babyArrow.y = FlxG.height - babyArrow.height - 24;
+			}
+			else if (useMobileLayout && player < 1)
+			{
+				// Keep opponent receptors visible, smaller, and centered at top.
 				babyArrow.scale.set(0.4, 0.4);
+				babyArrow.updateHitbox();
+				babyArrow.x = (FlxG.width - babyArrow.width * 4) * 0.5 + babyArrow.width * i;
+				babyArrow.y = 24;
 			}
 			#end
 		}
@@ -3325,7 +3332,7 @@ class PlayState extends MusicBeatState
 					var laneLeft:Float = receptor.x - hitPadding;
 					var laneRight:Float = receptor.x + receptor.width + hitPadding;
 					var laneTop:Float = receptor.y - receptor.height * 0.35;
-					var laneBottom:Float = FlxG.height;
+					var laneBottom:Float = receptor.y + receptor.height * 1.35;
 				if (touchPoint.x >= laneLeft && touchPoint.x <= laneRight
 					&& touchPoint.y >= laneTop && touchPoint.y <= laneBottom)
 					touched[lane] = true;
