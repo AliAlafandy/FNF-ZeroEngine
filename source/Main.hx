@@ -240,29 +240,85 @@ class Main extends Sprite
 
 		var stageWidth:Float = Lib.current.stage.stageWidth;
 		var stageHeight:Float = Lib.current.stage.stageHeight;
+		var margin:Float = 8;
+		var markWidth:Float = waterMark.width;
+		var markHeight:Float = waterMark.height;
 
-		// centered and the unused space becomes the side letterbox bars.
-		// Put the watermark inside a side bar instead of over the game.
-		/*if (FlxG.game != null)
+		// Wide Screen Mode fills the display, so keep the watermark at the
+		// bottom-right. Otherwise, place it inside an actual letterbox bar.
+		if (ClientPrefs.data.wideScreen || FlxG.game == null)
 		{
-			var gameLeft:Float = FlxG.game.x;
-			var gameRight:Float = gameLeft + FlxG.game.width;
-			var leftBarWidth:Float = gameLeft;
-			var rightBarWidth:Float = stageWidth - gameRight;
-			var margin:Float = 10;
+			waterMark.x = stageWidth - margin - markWidth;
+			waterMark.y = stageHeight - margin - markHeight;
+			return;
+		}
 
-			if (rightBarWidth >= waterMark.width + margin * 2)
-				waterMark.x = gameRight + (rightBarWidth - waterMark.width) * 0.5;
-			else if (leftBarWidth >= waterMark.width + margin * 2)
-				waterMark.x = (leftBarWidth - waterMark.width) * 0.5;
-			else
-				waterMark.x = stageWidth - margin - waterMark.width;
+		var gameLeft:Float = FlxG.game.x;
+		var gameTop:Float = FlxG.game.y;
+		var gameRight:Float = gameLeft + FlxG.game.width;
+		var gameBottom:Float = gameTop + FlxG.game.height;
+
+		// Clamp the viewport to the physical stage bounds.
+		gameLeft = Math.max(0, gameLeft);
+		gameTop = Math.max(0, gameTop);
+		gameRight = Math.min(stageWidth, gameRight);
+		gameBottom = Math.min(stageHeight, gameBottom);
+
+		var barX:Float = 0;
+		var barY:Float = 0;
+		var barWidth:Float = 0;
+		var barHeight:Float = 0;
+		var bestArea:Float = 0;
+
+		// Select the largest letterbox area that can contain the watermark.
+		var leftWidth:Float = gameLeft;
+		var rightWidth:Float = stageWidth - gameRight;
+		var topHeight:Float = gameTop;
+		var bottomHeight:Float = stageHeight - gameBottom;
+
+		if (leftWidth >= markWidth + margin * 2 && stageHeight >= markHeight + margin * 2)
+		{
+			barX = 0; barY = 0; barWidth = leftWidth; barHeight = stageHeight;
+			bestArea = barWidth * barHeight;
+		}
+		if (rightWidth >= markWidth + margin * 2 && stageHeight >= markHeight + margin * 2)
+		{
+			var area:Float = rightWidth * stageHeight;
+			if (area > bestArea)
+			{
+				barX = gameRight; barY = 0; barWidth = rightWidth; barHeight = stageHeight;
+				bestArea = area;
+			}
+		}
+		if (topHeight >= markHeight + margin * 2 && stageWidth >= markWidth + margin * 2)
+		{
+			var area:Float = stageWidth * topHeight;
+			if (area > bestArea)
+			{
+				barX = 0; barY = 0; barWidth = stageWidth; barHeight = topHeight;
+				bestArea = area;
+			}
+		}
+		if (bottomHeight >= markHeight + margin * 2 && stageWidth >= markWidth + margin * 2)
+		{
+			var area:Float = stageWidth * bottomHeight;
+			if (area > bestArea)
+			{
+				barX = 0; barY = gameBottom; barWidth = stageWidth; barHeight = bottomHeight;
+				bestArea = area;
+			}
+		}
+
+		if (bestArea > 0)
+		{
+			waterMark.x = barX + barWidth - margin - markWidth;
+			waterMark.y = barY + barHeight - margin - markHeight;
 		}
 		else
-			waterMark.x = stageWidth - 10 - waterMark.width;*/
-
-		waterMark.x = (stageWidth - 10) - waterMark.width;
-		waterMark.y = (stageHeight - 10) - waterMark.height;
+		{
+			// Very narrow bars cannot fit the icon; avoid covering gameplay.
+			waterMark.visible = false;
+		}
 	}
 	#end
 
