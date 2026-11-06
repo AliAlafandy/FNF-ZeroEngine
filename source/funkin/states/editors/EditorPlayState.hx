@@ -513,8 +513,7 @@ class EditorPlayState extends MusicBeatSubstate
 						{
 							if (sustainNote.mustPress)
 							{
-								var mobileNoteLaneX:Float = mobilePlayerLaneX(daNoteData);
-								sustainNote.x = mobileNoteLaneX + (Note.swagWidth * mobilePlayerArrowScale() - sustainNote.width) * 0.5;
+								sustainNote.x = mobilePlayerNoteX(daNoteData, sustainNote.width);
 							}
 							else sustainNote.visible = false;
 						}
@@ -535,8 +534,7 @@ class EditorPlayState extends MusicBeatSubstate
 				{
 					if (swagNote.mustPress)
 					{
-						var mobileNoteLaneX:Float = mobilePlayerLaneX(daNoteData);
-						swagNote.x = mobileNoteLaneX + (Note.swagWidth * mobilePlayerArrowScale() - swagNote.width) * 0.5;
+						swagNote.x = mobilePlayerNoteX(daNoteData, swagNote.width);
 					}
 					else swagNote.visible = false;
 				}
@@ -561,11 +559,21 @@ class EditorPlayState extends MusicBeatSubstate
 	}
 	
 	#if mobile
+	/**
+	 * Mode 4 uses the same four lane centers for receptors, tap notes and
+	 * sustain notes. StrumNote's graphic is already sized to 70% in StrumNote.hx;
+	 * do not apply that scale a second time here.
+	 */
 	private inline function mobilePlayerLaneX(lane:Int):Float
 	{
-		var spacing:Float = Note.swagWidth;
-		var groupWidth:Float = spacing * 4;
-		return (FlxG.width - groupWidth) * 0.5 + spacing * lane;
+		var laneWidth:Float = Note.swagWidth;
+		var groupWidth:Float = laneWidth * 4;
+		return (FlxG.width - groupWidth) * 0.5 + laneWidth * lane;
+	}
+
+	private inline function mobilePlayerNoteX(lane:Int, noteWidth:Float):Float
+	{
+		return mobilePlayerLaneX(lane) + (Note.swagWidth - noteWidth) * 0.5;
 	}
 	#end
 
