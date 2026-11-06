@@ -1895,11 +1895,6 @@ class PlayState extends MusicBeatState
 	public var skipArrowStartTween:Bool = false; //for lua
 
 	#if mobile
-	/**
-	 * Mode 4 uses the same four lane centers for receptors, tap notes and
-	 * sustain notes. StrumNote's graphic is already sized to 70% in StrumNote.hx;
-	 * do not apply that scale a second time here.
-	 */
 	private inline function mobilePlayerLaneX(lane:Int):Float
 	{
 		var laneWidth:Float = Note.swagWidth;
@@ -1923,7 +1918,6 @@ class PlayState extends MusicBeatState
 
 		var strumLineX:Float = useMobileLayout ? 0 : (ClientPrefs.data.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X);
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
-
 
 		for (i in 0...4)
 		{
@@ -1967,12 +1961,12 @@ class PlayState extends MusicBeatState
 			{
 				babyArrow.updateHitbox();
 				babyArrow.x = mobilePlayerLaneX(i);
-				babyArrow.y = FlxG.height - babyArrow.height - 124;
+				babyArrow.y = FlxG.height - babyArrow.height - 104;
 			} else if (useMobileLayout && player < 1) {
 				babyArrow.scale.set(0.4, 0.4);
 				babyArrow.updateHitbox();
-				babyArrow.x = 12 + (babyArrow.width + 8) * i;
-				babyArrow.y = 64;
+				babyArrow.x = 22 + (babyArrow.width + 8) * i;
+				babyArrow.y = 54;
 			}
 			#end
 		}
