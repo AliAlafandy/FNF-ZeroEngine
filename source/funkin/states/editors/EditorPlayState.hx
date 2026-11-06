@@ -562,29 +562,18 @@ class EditorPlayState extends MusicBeatSubstate
 	
 	#if mobile
 	/**
-	 * FNF Mobile mode 4 layout helpers. Keep receptors and incoming player notes
-	 * on exactly the same lane positions.
+	 * Standard-size FNF Mobile player row: four evenly spaced receptors,
+	 * centered horizontally. Notes use this same lane calculation.
 	 */
-	private inline function mobileLayoutAmplification():Float
-	{
-		return (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
-	}
-
 	private inline function mobilePlayerArrowScale():Float
 	{
-		return (FlxG.height / FlxG.width) * 1.95 * mobileLayoutAmplification();
-	}
-
-	private inline function mobilePlayerLaneSpacing():Float
-	{
-		return Note.swagWidth * ((FlxG.height / FlxG.width) * 2.8 * mobileLayoutAmplification());
+		return 1.0;
 	}
 
 	private inline function mobilePlayerLaneX(lane:Int):Float
 	{
-		var arrowWidth:Float = Note.swagWidth * mobilePlayerArrowScale();
-		var spacing:Float = mobilePlayerLaneSpacing();
-		var groupWidth:Float = arrowWidth + spacing * 3;
+		var spacing:Float = Note.swagWidth;
+		var groupWidth:Float = spacing * 4;
 		return (FlxG.width - groupWidth) * 0.5 + spacing * lane;
 	}
 	#end
@@ -600,9 +589,6 @@ class EditorPlayState extends MusicBeatSubstate
 		var strumLineX:Float = useMobileLayout ? 0 : (ClientPrefs.data.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X);
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 
-		#if mobile
-		var mobileAmplification:Float = mobileLayoutAmplification();
-		#end
 
 		for (i in 0...4)
 		{
@@ -650,21 +636,19 @@ class EditorPlayState extends MusicBeatSubstate
 			#if mobile
 			if (useMobileLayout && player == 1)
 			{
-				// Official FNF Mobile: enlarged, evenly spaced, bottom-centered row.
-				var playerScale:Float = mobilePlayerArrowScale();
-				babyArrow.scale.set(playerScale, playerScale);
+				// Standard-size, evenly spaced player receptors centered at the bottom.
+				babyArrow.scale.set(mobilePlayerArrowScale(), mobilePlayerArrowScale());
 				babyArrow.updateHitbox();
 				babyArrow.x = mobilePlayerLaneX(i);
-				babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
+				babyArrow.y = FlxG.height - babyArrow.height - 32;
 			}
 			else if (useMobileLayout && player < 1)
 			{
-				// Compact opponent receptors at the upper-left beside the health bar.
-				var opponentScale:Float = 0.4 * mobileAmplification;
-				babyArrow.scale.set(opponentScale, opponentScale);
+				// Compact opponent receptors in a tidy row at the upper-left.
+				babyArrow.scale.set(0.4, 0.4);
 				babyArrow.updateHitbox();
-				babyArrow.x = 12 + babyArrow.width * i;
-				babyArrow.y = FlxG.height * 0.025;
+				babyArrow.x = 12 + (babyArrow.width + 8) * i;
+				babyArrow.y = 24;
 			}
 			#end
 		}
