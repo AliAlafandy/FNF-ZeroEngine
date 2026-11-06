@@ -567,7 +567,9 @@ class EditorPlayState extends MusicBeatSubstate
 	 */
 	private inline function mobilePlayerArrowScale():Float
 	{
-		return 1.0;
+		// The source receptor graphic is larger than the original mobile HUD.
+		// Scale it down while keeping note lanes aligned to the same centers.
+		return 0.65;
 	}
 
 	private inline function mobilePlayerLaneX(lane:Int):Float
@@ -648,7 +650,8 @@ class EditorPlayState extends MusicBeatSubstate
 				babyArrow.scale.set(0.4, 0.4);
 				babyArrow.updateHitbox();
 				babyArrow.x = 12 + (babyArrow.width + 8) * i;
-				babyArrow.y = 24;
+				// Keep receptors below the FPS/version overlay.
+				babyArrow.y = 64;
 			}
 			#end
 		}
