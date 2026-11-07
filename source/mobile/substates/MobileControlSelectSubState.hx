@@ -353,18 +353,6 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		updatePosText();
 	}
 
-	private inline function mobilePlayerLaneX(lane:Int):Float
-	{
-		var laneWidth:Float = Note.swagWidth;
-		var groupWidth:Float = laneWidth * 4;
-		return (FlxG.width - groupWidth) * 0.75 + laneWidth * lane;
-	}
-
-	private inline function mobilePlayerNoteX(lane:Int, noteWidth:Float):Float
-	{
-		return mobilePlayerLaneX(lane) + (Note.swagWidth - noteWidth) * 0.75;
-	}
-
 	private function generateStaticArrows(player:Int):Void
 	{
 		var useMobileLayout:Bool = (options[curOption] == 'Official');
@@ -405,13 +393,13 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			if (useMobileLayout && player == 1)
 			{
 				babyArrow.updateHitbox();
-				babyArrow.x = (FlxG.width / 2) - mobilePlayerLaneX(i);
-				if(i > 1) babyArrow.x = (FlxG.width / 2) + mobilePlayerLaneX(i);
+				babyArrow.x += ((FlxG.width / 2) - 25) + ((babyArrow.width + 10) * i);
+				if(i > 1) babyArrow.x += ((FlxG.width / 2) + 25) + ((babyArrow.width + 10) * i);
 				babyArrow.y = FlxG.height - babyArrow.height - 104;
 			} else if (useMobileLayout && player < 1) {
 				babyArrow.scale.set(0.4, 0.4);
 				babyArrow.updateHitbox();
-				babyArrow.x = 32 + (babyArrow.width * i);
+				babyArrow.x = 52 + (babyArrow.width * i);
 				babyArrow.y = 54;
 			}
 		}
