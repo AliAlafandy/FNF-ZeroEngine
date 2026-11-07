@@ -4,9 +4,6 @@ import funkin.data.backend.Song;
 import funkin.data.backend.Section;
 import funkin.data.backend.Rating;
 import mobile.data.backend.MobileData;
-import mobile.data.objects.TouchButton;
-import mobile.input.MobileInputID;
-import mobile.input.MobileInputManager;
 
 import funkin.data.objects.Note;
 import funkin.data.objects.NoteSplash;
@@ -60,7 +57,6 @@ class EditorPlayState extends MusicBeatSubstate
 
 	#if mobile
 	private var mobileStrumTouchState:Array<Bool> = [false, false, false, false];
-	private var mobileExtraTouchState:Array<Bool> = [false, false];
 	#end
 	
 	var songHits:Int = 0;
@@ -485,11 +481,10 @@ class EditorPlayState extends MusicBeatSubstate
 						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 
 						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, oldNote, true, this);
-						sustainNote.mustPress = gottaHitNote;
 						#if mobile
-						// Match the bottom player receptors in Official Mobile mode.
 						if (MobileData.mode == 4 && sustainNote.mustPress) sustainNote.flipY = true;
 						#end
+						sustainNote.mustPress = gottaHitNote;
 						//sustainNote.gfNote = (section.gfSection && (songNotes[1]<4));
 						sustainNote.noteType = swagNote.noteType;
 						sustainNote.scrollFactor.set();
@@ -509,9 +504,6 @@ class EditorPlayState extends MusicBeatSubstate
 
 							if(ClientPrefs.data.downScroll)
 								sustainNote.correctionOffset = 0;
-							#if mobile
-							else if (MobileData.mode == 4 && sustainNote.mustPress) sustainNote.correctionOffset = 0;
-							#end
 						}
 						else if(oldNote.isSustainNote)
 						{
@@ -568,6 +560,25 @@ class EditorPlayState extends MusicBeatSubstate
 
 		unspawnNotes.sort(PlayState.sortByTime);
 	}
+	
+	#if mobile
+	/**
+	 * Mode 4 uses the same four lane centers for receptors, tap notes and
+	 * sustain notes. StrumNote's graphic is already sized to 70% in StrumNote.hx;
+	 * do not apply that scale a second time here.
+	 */
+	private inline function mobilePlayerLaneX(lane:Int):Float
+	{
+		var laneWidth:Float = Note.swagWidth;
+		var groupWidth:Float = laneWidth * 4;
+		return (FlxG.width - groupWidth) * 0.5 + laneWidth * lane;
+	}
+
+	private inline function mobilePlayerNoteX(lane:Int, noteWidth:Float):Float
+	{
+		return mobilePlayerLaneX(lane) + (Note.swagWidth - noteWidth) * 0.5;
+	}
+	#end
 
 	private function generateStaticArrows(player:Int):Void
 	{
@@ -910,36 +921,8 @@ class EditorPlayState extends MusicBeatSubstate
 	}
 
 	#if mobile
-	private function updateOfficialExtraTouchZones():Void
-	{
-		var active:Array<Bool> = [false, false];
-		if (MobileData.mode == 4 && ClientPrefs.data.extraButtons != 'NONE')
-		{
-			var top:Float = FlxG.height * 0.25;
-			var bottom:Float = (playerStrums != null && playerStrums.length > 0) ? playerStrums.members[0].y : FlxG.height;
-			for (touch in FlxG.touches.list)
-			{
-				if (!touch.pressed) continue;
-				var point:FlxPoint = touch.getScreenPosition(FlxG.camera, FlxPoint.get());
-				if (point.y >= top && point.y < bottom)
-				{
-					if (point.x < FlxG.width * 0.5) active[0] = true;
-					else if (ClientPrefs.data.extraButtons == 'DOUBLE') active[1] = true;
-				}
-				point.put();
-			}
-		}
-		for (i in 0...2)
-		{
-			if (i == 1 && ClientPrefs.data.extraButtons != 'DOUBLE') active[i] = false;
-			// Chart-editor playtesting has no script callback host; retain the touch zones here.
-			mobileExtraTouchState[i] = active[i];
-		}
-	}
 	private function updateMobileStrums():Void
 	{
-		updateOfficialExtraTouchZones();
-		updateOfficialExtraButtons();
 		if (MobileData.mode != 4)
 		{
 			for (lane in 0...4)
