@@ -5,9 +5,6 @@ import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.util.FlxGradient;
 
-import funkin.data.objects.Note;
-import funkin.data.objects.StrumNote;
-
 import mobile.data.backend.TouchUtil;
 
 import flixel.input.touch.FlxTouch;
@@ -29,16 +26,6 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 	var bindButton:TouchButton;
 	var reset:UIButton;
 	var tweenieShit:Float = 0;
-
-	#if mobile
-	var strumLineNotes:FlxTypedGroup<StrumNote>;
-	var opponentStrums:FlxTypedGroup<StrumNote>;
-	var playerStrums:FlxTypedGroup<StrumNote>;
-
-	private var mobileStrumTouchState:Array<Bool> = [false, false, false, false];
-	public var mobileExtraButtons:MobileInputManager;
-	private var mobileExtraButtonMode:String = '';
-	#end
 
 	public function new()
 	{
@@ -101,13 +88,6 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		add(positionTextBg);
 		positionText.cameras = [ui];
 		add(positionText);
-
-		if (options[curOption] == 'Official') {
-			strumLineNotes = new FlxTypedGroup<StrumNote>();
-			opponentStrums = new FlxTypedGroup<StrumNote>();
-			playerStrums = new FlxTypedGroup<StrumNote>();
-			generateStaticArrows(1);
-		}
 
 		var exit = new UIButton(0, itemText.y - 25, "Exit & Save", () ->
 		{
@@ -241,12 +221,6 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			});
 		}
 
-		#if mobile
-		if (options[curOption] == 'Official') {
-			updateMobileStrums();
-		}
-		#end
-
 		tweenieShit += 180 * elapsed;
 
 		super.update(elapsed);
@@ -351,169 +325,5 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		bindButton.x = touch.x - Std.int(bindButton.width / 2);
 		bindButton.y = touch.y - Std.int(bindButton.height / 2);
 		updatePosText();
-	}
-
-	private function generateStaticArrows(player:Int):Void
-	{
-		var useMobileLayout:Bool = (options[curOption] == 'Official');
-
-		var strumLineX:Float = useMobileLayout ? 0 : (ClientPrefs.data.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X);
-		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
-
-		for (i in 0...4)
-		{
-			var targetAlpha:Float = 1;
-			if (player < 1 && !useMobileLayout)
-			{
-				if(!ClientPrefs.data.opponentStrums) targetAlpha = 0;
-				else if(ClientPrefs.data.middleScroll) targetAlpha = 0.35;
-			}
-
-			var babyArrow:StrumNote = new StrumNote(strumLineX, strumLineY, i, player);
-			babyArrow.downScroll = useMobileLayout ? player == 1 : ClientPrefs.data.downScroll;
-
-			if (useMobileLayout) targetAlpha = 1;
-
-			babyArrow.alpha = targetAlpha;
-
-			if (player == 1) {
-				playerStrums.add(babyArrow);
-			} else {
-				if(ClientPrefs.data.middleScroll && !useMobileLayout)
-				{
-					babyArrow.x += 310;
-					if(i > 1) babyArrow.x += FlxG.width / 2 + 25;
-				}
-				opponentStrums.add(babyArrow);
-			}
-
-			strumLineNotes.add(babyArrow);
-			babyArrow.postAddedToGroup();
-
-			if (useMobileLayout && player == 1)
-			{
-				babyArrow.updateHitbox();
-				babyArrow.x += ((FlxG.width / 2) - 25) + ((babyArrow.width + 10) * i);
-				if(i > 1) babyArrow.x += ((FlxG.width / 2) + 25) + ((babyArrow.width + 10) * i);
-				babyArrow.y = FlxG.height - babyArrow.height - 104;
-			} else if (useMobileLayout && player < 1) {
-				babyArrow.scale.set(0.4, 0.4);
-				babyArrow.updateHitbox();
-				babyArrow.x = 52 + (babyArrow.width * i);
-				babyArrow.y = 54;
-			}
-		}
-	}
-
-	private function updateOfficialExtraButtons():Void
-	{
-		if (mobileExtraButtons == null || mobileExtraButtonMode != ClientPrefs.data.extraButtons)
-		{
-			if (mobileExtraButtons != null)
-			{
-				remove(mobileExtraButtons, true);
-				mobileExtraButtons.destroy();
-			}
-			mobileExtraButtons = new MobileInputManager();
-			mobileExtraButtonMode = ClientPrefs.data.extraButtons;
-			createOfficialExtraButton(MobileInputID.EXTRA_1, 'S', 0xFF0066FF);
-			if (mobileExtraButtonMode == 'DOUBLE')
-				createOfficialExtraButton(MobileInputID.EXTRA_2, 'G', 0xFFA6FF00);
-			mobileExtraButtons.updateTrackedButtons();
-			mobileExtraButtons.cameras = [FlxG.camera];
-			mobileExtraButtons.scrollFactor.set();
-			add(mobileExtraButtons);
-		}
-
-		var firstStrum:StrumNote = (playerStrums != null && playerStrums.length > 0) ? playerStrums.members[0] : null;
-		var buttonY:Float = FlxG.height * 0.43;
-		if (firstStrum != null)
-			buttonY = (FlxG.height * 0.25 + firstStrum.y - mobileExtraButtons.members[0].height) * 0.5;
-
-		var count:Int = mobileExtraButtons.length;
-		var buttonWidth:Float = mobileExtraButtons.members[0].width;
-		var spacing:Float = 16;
-		var totalWidth:Float = count * buttonWidth + (count - 1) * spacing;
-		var startX:Float = (FlxG.width - totalWidth) * 0.5;
-		for (i in 0...count)
-			mobileExtraButtons.members[i].setPosition(startX + i * (buttonWidth + spacing), buttonY);
-	}
-
-	private function createOfficialExtraButton(id:MobileInputID, graphic:String, tint:FlxColor):Void
-	{
-		var button:TouchButton = new TouchButton(0, 0, [id]);
-		button.label = new FlxSprite();
-		button.loadGraphic(Paths.image('touchpad/bg', 'mobile'));
-		button.label.loadGraphic(Paths.image('touchpad/' + graphic, 'mobile'));
-		button.scale.set(0.243, 0.243);
-		button.updateHitbox();
-		button.updateLabelPosition();
-		button.statusBrightness = [1, 0.8, 0.4];
-		button.statusIndicatorType = BRIGHTNESS;
-		button.indicateStatus();
-		button.label.antialiasing = button.antialiasing = ClientPrefs.data.antialiasing;
-		button.color = tint;
-		button.parentAlpha = ClientPrefs.data.controlsAlpha;
-		button.onDown.callback = function() {};
-		button.onOut.callback = button.onUp.callback = function() {};
-		mobileExtraButtons.add(button);
-	}
-	private function updateMobileStrums():Void
-	{
-		updateOfficialExtraButtons();
-
-		var touched:Array<Bool> = [false, false, false, false];
-		for (touch in FlxG.touches.list)
-		{
-			if (!touch.pressed) continue;
-
-			var point:FlxPoint = touch.getScreenPosition(FlxG.camera, FlxPoint.get());
-			for (lane in 0...playerStrums.length)
-			{
-				var receptor:StrumNote = playerStrums.members[lane];
-				if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
-
-				// Match the broad, thumb-friendly FNF Mobile lane hit areas.
-				// Keep the touch target close to the actual receptor instead
-				// of treating the entire screen half as a lane.
-				// Extend each hit area to the midpoint between adjacent lanes,
-				// plus a small overlap. Touching the gap can then activate both
-				// neighboring directions (e.g. Left + Down).
-				var laneGap:Float = Math.max(0, Note.swagWidth - receptor.width);
-				var pairOverlap:Float = laneGap * 0.5 + 8;
-				var laneLeft:Float = receptor.x;
-				var laneRight:Float = receptor.x + receptor.width;
-				// Only the intended pairs share touch space:
-				// Left + Down (0/1) and Up + Right (2/3).
-				// The Down + Up boundary stays separate.
-				if (lane == 1 || lane == 3) laneLeft -= pairOverlap;
-				if (lane == 0 || lane == 2) laneRight += pairOverlap;
-				var laneTop:Float = receptor.y - receptor.height * 0.35;
-				var laneBottom:Float = receptor.y + receptor.height * 1.35;
-				if (point.x >= laneLeft && point.x <= laneRight
-					&& point.y >= laneTop && point.y <= laneBottom)
-					touched[lane] = true;
-			}
-			point.put();
-		}
-
-		for (lane in 0...4)
-		{
-			var receptor:StrumNote = playerStrums.members[lane];
-			if (receptor != null)
-			{
-				if (touched[lane] && !mobileStrumTouchState[lane])
-				{
-					receptor.playAnim('pressed');
-					receptor.resetAnim = 0;
-				}
-				else if (!touched[lane] && mobileStrumTouchState[lane])
-				{
-					receptor.playAnim('static');
-					receptor.resetAnim = 0;
-				}
-			}
-			mobileStrumTouchState[lane] = touched[lane];
-		}
 	}
 }
