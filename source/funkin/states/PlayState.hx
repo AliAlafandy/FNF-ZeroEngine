@@ -1895,7 +1895,7 @@ class PlayState extends MusicBeatState
 	public var skipArrowStartTween:Bool = false; //for lua
 
 	#if mobile
-	private inline function mobilePlayerScale():Float
+	/*private inline function mobilePlayerScale():Float
 	{
     	var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
     	return ((FlxG.height / FlxG.width) * 1.95) * amplification;
@@ -1905,11 +1905,11 @@ class PlayState extends MusicBeatState
 	{
     	var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
     	return Note.swagWidth * ((FlxG.height / FlxG.width) * 2.8) * amplification;
-	}
+	}*/
 
 	private inline function mobilePlayerLaneX(lane:Int):Float
 	{
-    	var spacing:Float = mobilePlayerSpacing();
+    	var spacing:Float = Note.swagWidth; // mobilePlayerSpacing()
     	var totalWidth:Float = spacing * 4;
     	return (FlxG.width - totalWidth) * 0.5 + spacing * lane;
 	}
@@ -1975,8 +1975,8 @@ class PlayState extends MusicBeatState
 				/*var scale:Float = mobilePlayerScale();
 				babyArrow.scale.set(0.7 * scale, 0.7 * scale);*/
 				babyArrow.updateHitbox();
-				babyArrow.x += mobilePlayerLaneX(i);
-				// if(i > 1) babyArrow.x += for real: Idk;
+				babyArrow.x += ((FlxG.width / 2) - 50) + (babyArrow.width + 10) * i; // mobilePlayerLaneX(i)
+				if(i > 1) babyArrow.x += ((FlxG.width / 2) + 50) + (babyArrow.width + 10) * i;
 				// babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
 				babyArrow.y = FlxG.height - babyArrow.height - 105;
 			} else if (useMobileLayout && player < 1) {
