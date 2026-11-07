@@ -1741,7 +1741,6 @@ class PlayState extends MusicBeatState
 						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, oldNote, true);
 						sustainNote.mustPress = gottaHitNote;
 						#if mobile
-						// Official Mobile places player receptors at the bottom, so sustain tails use Downscroll orientation.
 						if (MobileData.mode == 4 && sustainNote.mustPress) sustainNote.flipY = true;
 						#end
 						sustainNote.gfNote = (section.gfSection && (songNotes[1]<4));
