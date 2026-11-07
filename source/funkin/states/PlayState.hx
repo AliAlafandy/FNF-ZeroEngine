@@ -7,9 +7,6 @@ import funkin.data.backend.Song;
 import funkin.data.backend.Section;
 import funkin.data.backend.Rating;
 import mobile.data.backend.MobileData;
-import mobile.data.objects.TouchButton;
-import mobile.input.MobileInputID;
-import mobile.input.MobileInputManager;
 
 import flixel.FlxBasic;
 import flixel.FlxObject;
@@ -1739,10 +1736,10 @@ class PlayState extends MusicBeatState
 						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 
 						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, oldNote, true);
-						sustainNote.mustPress = gottaHitNote;
 						#if mobile
 						if (MobileData.mode == 4 && sustainNote.mustPress) sustainNote.flipY = true;
 						#end
+						sustainNote.mustPress = gottaHitNote;
 						sustainNote.gfNote = (section.gfSection && (songNotes[1]<4));
 						sustainNote.noteType = swagNote.noteType;
 						sustainNote.scrollFactor.set();
@@ -1762,9 +1759,6 @@ class PlayState extends MusicBeatState
 
 							if (useVSliceHUD ? gottaHitNote : ClientPrefs.data.downScroll)
 								sustainNote.correctionOffset = 0;
-							#if mobile
-							else if (MobileData.mode == 4 && sustainNote.mustPress) sustainNote.correctionOffset = 0;
-							#end
 						}
 						else if(oldNote.isSustainNote)
 						{
@@ -1899,6 +1893,26 @@ class PlayState extends MusicBeatState
 	}
 
 	public var skipArrowStartTween:Bool = false; //for lua
+
+	#if mobile
+	/**
+	 * Mode 4 uses the same four lane centers for receptors, tap notes and
+	 * sustain notes. StrumNote's graphic is already sized to 70% in StrumNote.hx;
+	 * do not apply that scale a second time here.
+	 */
+	private inline function mobilePlayerLaneX(lane:Int):Float
+	{
+		var laneWidth:Float = Note.swagWidth;
+		var groupWidth:Float = laneWidth * 4;
+		return (FlxG.width - groupWidth) * 0.5 + laneWidth * lane;
+	}
+
+	private inline function mobilePlayerNoteX(lane:Int, noteWidth:Float):Float
+	{
+		return mobilePlayerLaneX(lane) + (Note.swagWidth - noteWidth) * 0.5;
+	}
+	#end
+
 	private function generateStaticArrows(player:Int):Void
 	{
 		#if mobile
@@ -1909,6 +1923,7 @@ class PlayState extends MusicBeatState
 
 		var strumLineX:Float = useMobileLayout ? 0 : (ClientPrefs.data.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X);
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
+
 
 		for (i in 0...4)
 		{
@@ -3290,49 +3305,9 @@ class PlayState extends MusicBeatState
 
 	#if mobile
 	private var mobileStrumTouchState:Array<Bool> = [false, false, false, false];
-	private var mobileExtraTouchState:Array<Bool> = [false, false];
 
-	private function updateOfficialExtraTouchZones():Void
-	{
-		var enabled:Bool = MobileData.mode == 4 && ClientPrefs.data.extraButtons != 'NONE';
-		var active:Array<Bool> = [false, false];
-		if (enabled && !paused && !inCutscene && generatedMusic && !endingSong && !cpuControlled && boyfriend != null && !boyfriend.stunned)
-		{
-			var top:Float = healthBar != null ? healthBar.y + healthBar.height : FlxG.height * 0.25;
-			var bottom:Float = (playerStrums != null && playerStrums.length > 0) ? playerStrums.members[0].y : FlxG.height;
-			for (touch in FlxG.touches.list)
-			{
-				if (!touch.pressed) continue;
-				var point:FlxPoint = touch.getScreenPosition(camHUD, FlxPoint.get());
-				if (point.y >= top && point.y < bottom)
-				{
-					if (point.x < FlxG.width * 0.5) active[0] = true;
-					else if (ClientPrefs.data.extraButtons == 'DOUBLE') active[1] = true;
-				}
-				point.put();
-			}
-		}
-		for (i in 0...2)
-		{
-			if (i == 1 && ClientPrefs.data.extraButtons != 'DOUBLE') active[i] = false;
-			var id:MobileInputID = i == 0 ? MobileInputID.EXTRA_1 : MobileInputID.EXTRA_2;
-			if (active[i] && !mobileExtraTouchState[i])
-			{
-				callOnScripts('onButtonPressPre', [id]);
-				callOnScripts('onButtonPress', [id]);
-			}
-			else if (!active[i] && mobileExtraTouchState[i])
-			{
-				callOnScripts('onButtonReleasePre', [id]);
-				callOnScripts('onButtonRelease', [id]);
-			}
-			mobileExtraTouchState[i] = active[i];
-		}
-	}
 	private function updateMobileStrums():Void
 	{
-		updateOfficialExtraTouchZones();
-		updateOfficialExtraButtons();
 		if (MobileData.mode != 4)
 		{
 			for (lane in 0...4)
