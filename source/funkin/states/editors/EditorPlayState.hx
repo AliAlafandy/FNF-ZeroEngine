@@ -481,10 +481,10 @@ class EditorPlayState extends MusicBeatSubstate
 						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 
 						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, oldNote, true, this);
+						sustainNote.mustPress = gottaHitNote;
 						#if mobile
 						if (MobileData.mode == 4 && sustainNote.mustPress) sustainNote.flipY = true;
 						#end
-						sustainNote.mustPress = gottaHitNote;
 						//sustainNote.gfNote = (section.gfSection && (songNotes[1]<4));
 						sustainNote.noteType = swagNote.noteType;
 						sustainNote.scrollFactor.set();
@@ -562,11 +562,6 @@ class EditorPlayState extends MusicBeatSubstate
 	}
 	
 	#if mobile
-	/**
-	 * Mode 4 uses the same four lane centers for receptors, tap notes and
-	 * sustain notes. StrumNote's graphic is already sized to 70% in StrumNote.hx;
-	 * do not apply that scale a second time here.
-	 */
 	private inline function mobilePlayerLaneX(lane:Int):Float
 	{
 		var laneWidth:Float = Note.swagWidth;
@@ -627,14 +622,14 @@ class EditorPlayState extends MusicBeatSubstate
 			if (useMobileLayout && player == 1)
 			{
 				babyArrow.updateHitbox();
-				babyArrow.x += ((FlxG.width / 2) - 25) + ((babyArrow.width + 10) * i);
-				if(i > 1) babyArrow.x += ((FlxG.width / 2) + 25) + ((babyArrow.width + 10) * i);
-				babyArrow.y = FlxG.height - babyArrow.height - 104;
+				babyArrow.x += (FlxG.width / 2) + ((babyArrow.width + 10) * mobilePlayerLaneX(i));
+				if(i > 1) babyArrow.x += (FlxG.width / 2) + ((babyArrow.width + 10) * mobilePlayerLaneX(i));
+				babyArrow.y = FlxG.height - babyArrow.height - 105;
 			} else if (useMobileLayout && player < 1) {
 				babyArrow.scale.set(0.4, 0.4);
 				babyArrow.updateHitbox();
-				babyArrow.x = 52 + (babyArrow.width * i);
-				babyArrow.y = 54;
+				babyArrow.x = 50 + (babyArrow.width * i);
+				babyArrow.y = 55;
 			}
 			#end
 		}
