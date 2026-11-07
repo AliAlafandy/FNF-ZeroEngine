@@ -511,10 +511,20 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 
 		for (lane in 0...4)
 		{
-			if (touched[lane] && !mobileStrumTouchState[lane])
-				keyPressed(lane);
-			else if (!touched[lane] && mobileStrumTouchState[lane])
-				keyReleased(lane);
+			var receptor:StrumNote = playerStrums.members[lane];
+			if (receptor != null)
+			{
+				if (touched[lane] && !mobileStrumTouchState[lane])
+				{
+					receptor.playAnim('pressed');
+					receptor.resetAnim = 0;
+				}
+				else if (!touched[lane] && mobileStrumTouchState[lane])
+				{
+					receptor.playAnim('static');
+					receptor.resetAnim = 0;
+				}
+			}
 			mobileStrumTouchState[lane] = touched[lane];
 		}
 	}
