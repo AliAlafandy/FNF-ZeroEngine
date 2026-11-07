@@ -487,6 +487,10 @@ class EditorPlayState extends MusicBeatSubstate
 
 						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, oldNote, true, this);
 						sustainNote.mustPress = gottaHitNote;
+						#if mobile
+						// Match the bottom player receptors in Official Mobile mode.
+						if (MobileData.mode == 4 && sustainNote.mustPress) sustainNote.flipY = true;
+						#end
 						//sustainNote.gfNote = (section.gfSection && (songNotes[1]<4));
 						sustainNote.noteType = swagNote.noteType;
 						sustainNote.scrollFactor.set();
@@ -506,6 +510,9 @@ class EditorPlayState extends MusicBeatSubstate
 
 							if(ClientPrefs.data.downScroll)
 								sustainNote.correctionOffset = 0;
+							#if mobile
+							else if (MobileData.mode == 4 && sustainNote.mustPress) sustainNote.correctionOffset = 0;
+							#end
 						}
 						else if(oldNote.isSustainNote)
 						{
