@@ -1895,16 +1895,28 @@ class PlayState extends MusicBeatState
 	public var skipArrowStartTween:Bool = false; //for lua
 
 	#if mobile
+	private inline function mobilePlayerScale():Float
+	{
+    	var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+    	return ((FlxG.height / FlxG.width) * 1.95) * amplification;
+	}
+
+	private inline function mobilePlayerSpacing():Float
+	{
+    	var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+    	return Note.swagWidth * ((FlxG.height / FlxG.width) * 2.8) * amplification;
+	}
+
 	private inline function mobilePlayerLaneX(lane:Int):Float
 	{
-		var laneWidth:Float = Note.swagWidth;
-		var groupWidth:Float = laneWidth * 4;
-		return (FlxG.width - groupWidth) * 0.5 + laneWidth * lane;
+    	var spacing:Float = mobilePlayerSpacing();
+    	var totalWidth:Float = spacing * 4;
+    	return (FlxG.width - totalWidth) * 0.5 + spacing * lane;
 	}
 
 	private inline function mobilePlayerNoteX(lane:Int, noteWidth:Float):Float
 	{
-		return mobilePlayerLaneX(lane) + (Note.swagWidth - noteWidth) * 0.5;
+    	return mobilePlayerLaneX(lane) + (Note.swagWidth - noteWidth) * 0.5;
 	}
 	#end
 
@@ -1960,11 +1972,16 @@ class PlayState extends MusicBeatState
 			#if mobile
 			if (useMobileLayout && player == 1)
 			{
+				/*var scale:Float = mobilePlayerScale();
+				babyArrow.scale.set(0.7 * scale, 0.7 * scale);*/
 				babyArrow.updateHitbox();
 				babyArrow.x += mobilePlayerLaneX(i);
-				// if(i > 1) babyArrow.x += mobilePlayerLaneX(i) + 25;
+				// if(i > 1) babyArrow.x += for real: Idk;
+				// babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
 				babyArrow.y = FlxG.height - babyArrow.height - 105;
 			} else if (useMobileLayout && player < 1) {
+				/*var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+    			babyArrow.scale.set(0.7 * 0.4 * amplification, 0.7 * 0.4 * amplification);*/
 				babyArrow.scale.set(0.4, 0.4);
 				babyArrow.updateHitbox();
 				babyArrow.x = 50 + (babyArrow.width * i);
