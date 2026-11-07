@@ -1931,7 +1931,6 @@ class PlayState extends MusicBeatState
 		var strumLineX:Float = useMobileLayout ? 0 : (ClientPrefs.data.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X);
 		var strumLineY:Float = useMobileLayout ? 0 : (ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50);
 
-
 		for (i in 0...4)
 		{
 			var targetAlpha:Float = 1;
@@ -1975,7 +1974,7 @@ class PlayState extends MusicBeatState
 				/*var scale:Float = mobilePlayerScale();
 				babyArrow.scale.set(0.7 * scale, 0.7 * scale);*/
 				babyArrow.updateHitbox();
-				babyArrow.x += ((FlxG.width / 2) - 50) + (babyArrow.width + 10) * i; // mobilePlayerLaneX(i)
+				babyArrow.x += 50 + (babyArrow.width * i); // mobilePlayerLaneX(i)
 				if(i > 1) babyArrow.x += ((FlxG.width / 2) + 50) + (babyArrow.width + 10) * i;
 				// babyArrow.y = (FlxG.height - babyArrow.height) * 0.95;
 				babyArrow.y = FlxG.height - babyArrow.height - 105;
