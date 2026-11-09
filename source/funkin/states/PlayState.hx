@@ -1899,7 +1899,7 @@ class PlayState extends MusicBeatState
 	{
 		var laneWidth:Float = Note.swagWidth;
 		var groupWidth:Float = laneWidth * 4;
-		return (FlxG.width - groupWidth) * 0.5 + laneWidth * lane;
+		return (FlxG.width - (groupWidth / 2)) * 0.5 + laneWidth * lane;
 	}
 
 	private inline function mobilePlayerNoteX(lane:Int, noteWidth:Float):Float
@@ -1960,7 +1960,8 @@ class PlayState extends MusicBeatState
 			if (useMobileLayout && player == 1)
 			{
 				babyArrow.updateHitbox();
-				if (i > 1) babyArrow.x += (FlxG.width / 2) + mobilePlayerLaneX(i);
+				babyArrow.x += mobilePlayerLaneX(i);
+				if(i > 1) babyArrow.x += mobilePlayerLaneX(i) + 50;
 				babyArrow.y = FlxG.height - babyArrow.height - 105;
 			} else if (useMobileLayout && player < 1) {
 				babyArrow.scale.set(0.4, 0.4);
