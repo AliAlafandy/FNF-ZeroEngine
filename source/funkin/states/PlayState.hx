@@ -1960,11 +1960,7 @@ class PlayState extends MusicBeatState
 			if (useMobileLayout && player == 1)
 			{
 				babyArrow.updateHitbox();
-				if (i > 1) {
-					babyArrow.x += (FlxG.width / 2) + mobilePlayerLaneX(i);
-				} else {
-					babyArrow.x += mobilePlayerLaneX(i);
-				}
+				if (i > 1) babyArrow.x += (FlxG.width / 2) + mobilePlayerLaneX(i);
 				babyArrow.y = FlxG.height - babyArrow.height - 105;
 			} else if (useMobileLayout && player < 1) {
 				babyArrow.scale.set(0.4, 0.4);
