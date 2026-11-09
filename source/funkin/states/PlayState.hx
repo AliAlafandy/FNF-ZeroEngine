@@ -1778,7 +1778,14 @@ class PlayState extends MusicBeatState
 						else
 						#end
 
-						if (sustainNote.mustPress) sustainNote.x += FlxG.width / 2; // general offset
+						if (sustainNote.mustPress)
+						{
+							#if mobile
+							if (MobileData.mode != 4) sustainNote.x += FlxG.width / 2;
+							#else
+							sustainNote.x += FlxG.width / 2;
+							#end
+						}
 						else if(ClientPrefs.data.middleScroll && !useVSliceHUD)
 						{
 							sustainNote.x += 310;
@@ -1802,7 +1809,11 @@ class PlayState extends MusicBeatState
 
 				if (swagNote.mustPress)
 				{
-					swagNote.x += FlxG.width / 2; // general offset
+					#if mobile
+					if (MobileData.mode != 4) swagNote.x += FlxG.width / 2;
+					#else
+					swagNote.x += FlxG.width / 2;
+					#end
 				}
 				else if(ClientPrefs.data.middleScroll && !useVSliceHUD)
 				{
@@ -1895,16 +1906,30 @@ class PlayState extends MusicBeatState
 	public var skipArrowStartTween:Bool = false; //for lua
 
 	#if mobile
+	private inline function mobilePlayerStrumlineScale():Float
+	{
+		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+		return ((FlxG.height / FlxG.width) * 1.95) * amplification;
+	}
+
+	private inline function mobilePlayerNoteSpacing():Float
+	{
+		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+		return Note.swagWidth * ((FlxG.height / FlxG.width) * 2.8) * amplification;
+	}
+
 	private inline function mobilePlayerLaneX(lane:Int):Float
 	{
-		var laneWidth:Float = Note.swagWidth;
-		var groupWidth:Float = laneWidth * 4;
-		return (FlxG.width - (groupWidth / 2)) * 0.5 + laneWidth * lane;
+		var arrowWidth:Float = Note.swagWidth * mobilePlayerStrumlineScale();
+		var spacing:Float = mobilePlayerNoteSpacing();
+		var groupWidth:Float = arrowWidth + spacing * 3;
+		return (FlxG.width - groupWidth) * 0.5 + spacing * lane;
 	}
 
 	private inline function mobilePlayerNoteX(lane:Int, noteWidth:Float):Float
 	{
-		return mobilePlayerLaneX(lane) + (Note.swagWidth - noteWidth) * 0.5;
+		var arrowWidth:Float = Note.swagWidth * mobilePlayerStrumlineScale();
+		return mobilePlayerLaneX(lane) + (arrowWidth - noteWidth) * 0.5;
 	}
 	#end
 
@@ -1959,9 +1984,9 @@ class PlayState extends MusicBeatState
 			#if mobile
 			if (useMobileLayout && player == 1)
 			{
+				babyArrow.scale.set(mobilePlayerStrumlineScale(), mobilePlayerStrumlineScale());
 				babyArrow.updateHitbox();
-				babyArrow.x += mobilePlayerLaneX(i);
-				if(i > 1) babyArrow.x += mobilePlayerLaneX(i) + 50;
+				babyArrow.x = mobilePlayerLaneX(i);
 				babyArrow.y = FlxG.height - babyArrow.height - 105;
 			} else if (useMobileLayout && player < 1) {
 				babyArrow.scale.set(0.4, 0.4);
