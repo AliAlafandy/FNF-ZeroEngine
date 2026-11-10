@@ -1778,14 +1778,7 @@ class PlayState extends MusicBeatState
 						else
 						#end
 
-						if (sustainNote.mustPress)
-						{
-							#if mobile
-							if (MobileData.mode != 4) sustainNote.x += FlxG.width / 2;
-							#else
-							sustainNote.x += FlxG.width / 2;
-							#end
-						}
+						if (sustainNote.mustPress) sustainNote.x += FlxG.width / 2; // general offset
 						else if(ClientPrefs.data.middleScroll && !useVSliceHUD)
 						{
 							sustainNote.x += 310;
@@ -1809,11 +1802,7 @@ class PlayState extends MusicBeatState
 
 				if (swagNote.mustPress)
 				{
-					#if mobile
-					if (MobileData.mode != 4) swagNote.x += FlxG.width / 2;
-					#else
-					swagNote.x += FlxG.width / 2;
-					#end
+					swagNote.x += FlxG.width / 2; // general offset
 				}
 				else if(ClientPrefs.data.middleScroll && !useVSliceHUD)
 				{
@@ -1906,12 +1895,6 @@ class PlayState extends MusicBeatState
 	public var skipArrowStartTween:Bool = false; //for lua
 
 	#if mobile
-	private inline function mobilePlayerStrumlineScale():Float
-	{
-		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
-		return ((FlxG.height / FlxG.width) * 1.95) * amplification;
-	}
-
 	private inline function mobilePlayerNoteSpacing():Float
 	{
 		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
@@ -1920,7 +1903,7 @@ class PlayState extends MusicBeatState
 
 	private inline function mobilePlayerLaneX(lane:Int):Float
 	{
-		var arrowWidth:Float = Note.swagWidth * mobilePlayerStrumlineScale();
+		var arrowWidth:Float = Note.swagWidth;
 		var spacing:Float = mobilePlayerNoteSpacing();
 		var groupWidth:Float = arrowWidth + spacing * 3;
 		return (FlxG.width - groupWidth) * 0.5 + spacing * lane;
@@ -1928,7 +1911,7 @@ class PlayState extends MusicBeatState
 
 	private inline function mobilePlayerNoteX(lane:Int, noteWidth:Float):Float
 	{
-		var arrowWidth:Float = Note.swagWidth * mobilePlayerStrumlineScale();
+		var arrowWidth:Float = Note.swagWidth;
 		return mobilePlayerLaneX(lane) + (arrowWidth - noteWidth) * 0.5;
 	}
 	#end
@@ -1984,7 +1967,6 @@ class PlayState extends MusicBeatState
 			#if mobile
 			if (useMobileLayout && player == 1)
 			{
-				babyArrow.scale.set(mobilePlayerStrumlineScale(), mobilePlayerStrumlineScale());
 				babyArrow.updateHitbox();
 				babyArrow.x = mobilePlayerLaneX(i);
 				babyArrow.y = FlxG.height - babyArrow.height - 105;
@@ -2778,7 +2760,8 @@ class PlayState extends MusicBeatState
 					}
 
 					lyricsText.screenCenter(X);
-					lyricsText.y = FlxG.height - 210; // 180
+					if(ClientPrefs.data.downScroll) lyricsText.y = 210; // 180
+					else lyricsText.y = FlxG.height - 210; // 180
 
 					lyricsBG.makeGraphic(Std.int(lyricsText.width + 16), Std.int(lyricsText.height + 8), FlxColor.BLACK);
 					lyricsBG.alpha = 0.6;
