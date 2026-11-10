@@ -274,6 +274,25 @@ class EditorPlayState extends MusicBeatSubstate
 			}
 		}
 
+		// Re-sort after spawning notes (not only on beatHit). Sustain pieces
+		// must be drawn before tap notes so note heads stay on top every frame.
+		if (notes != null && notes.length > 1)
+		{
+			var noteSortOrder:Int = #if mobile (MobileData.mode == 4 ? false : ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end
+				? FlxSort.ASCENDING : FlxSort.DESCENDING;
+
+			notes.sort(function(order:Int, a:Note, b:Note):Int
+			{
+				if (a == null) return b == null ? 0 : -1;
+				if (b == null) return 1;
+
+				if (a.isSustainNote != b.isSustainNote)
+					return a.isSustainNote ? -1 : 1;
+
+				return FlxSort.byY(order, a, b);
+			}, noteSortOrder);
+		}
+
 		keysCheck();
 		if(notes.length > 0)
 		{
@@ -340,20 +359,7 @@ class EditorPlayState extends MusicBeatSubstate
 			//trace('BEAT HIT: ' + curBeat + ', LAST HIT: ' + lastBeatHit);
 			return;
 		}
-		var noteSortOrder:Int = #if mobile (MobileData.mode == 4 ? false : ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end
-			? FlxSort.ASCENDING : FlxSort.DESCENDING;
 
-		// Draw sustain pieces first so tap note heads stay visible above them.
-		notes.sort(function(order:Int, a:Note, b:Note):Int
-		{
-			if (a == null) return b == null ? 0 : -1;
-			if (b == null) return 1;
-
-			if (a.isSustainNote != b.isSustainNote)
-				return a.isSustainNote ? -1 : 1;
-
-			return FlxSort.byY(order, a, b);
-		}, noteSortOrder);
 
 		super.beatHit();
 		lastBeatHit = curBeat;
@@ -958,7 +964,7 @@ class EditorPlayState extends MusicBeatSubstate
 			for (lane in 0...playerStrums.length)
 			{
 				var receptor:StrumNote = playerStrums.members[lane];
-				if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
+				if (receptor == null || !receptor.exists) continue;
 
 					// Keep each arrow's normal hit area independent.
 				// The empty space BETWEEN the two intended pairs is a shared
@@ -979,8 +985,7 @@ class EditorPlayState extends MusicBeatSubstate
 				if (pairStart + 1 >= playerStrums.length) continue;
 				var first:StrumNote = playerStrums.members[pairStart];
 				var second:StrumNote = playerStrums.members[pairStart + 1];
-				if (first == null || second == null || !first.exists || !second.exists
-					|| !first.visible || !second.visible || first.alpha <= 0.05 || second.alpha <= 0.05)
+				if (first == null || second == null || !first.exists || !second.exists)
 					continue;
 
 				var gapLeft:Float = first.x + first.width;
