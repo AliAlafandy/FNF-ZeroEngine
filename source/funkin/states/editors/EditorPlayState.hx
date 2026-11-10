@@ -562,16 +562,24 @@ class EditorPlayState extends MusicBeatSubstate
 	}
 	
 	#if mobile
+	private inline function mobilePlayerNoteSpacing():Float
+	{
+		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+		return Note.swagWidth * ((FlxG.height / FlxG.width) * 2.8) * amplification;
+	}
+
 	private inline function mobilePlayerLaneX(lane:Int):Float
 	{
-		var laneWidth:Float = Note.swagWidth;
-		var groupWidth:Float = laneWidth * 4;
-		return (FlxG.width - groupWidth) * 0.5 + laneWidth * lane;
+		var arrowWidth:Float = Note.swagWidth;
+		var spacing:Float = mobilePlayerNoteSpacing();
+		var groupWidth:Float = arrowWidth + spacing * 3;
+		return (FlxG.width - groupWidth) * 0.5 + spacing * lane;
 	}
 
 	private inline function mobilePlayerNoteX(lane:Int, noteWidth:Float):Float
 	{
-		return mobilePlayerLaneX(lane) + (Note.swagWidth - noteWidth) * 0.5;
+		var arrowWidth:Float = Note.swagWidth;
+		return mobilePlayerLaneX(lane) + (arrowWidth - noteWidth) * 0.5;
 	}
 	#end
 
@@ -622,9 +630,9 @@ class EditorPlayState extends MusicBeatSubstate
 			if (useMobileLayout && player == 1)
 			{
 				babyArrow.updateHitbox();
-				babyArrow.x += (FlxG.width / 2) + ((babyArrow.width + 10) * mobilePlayerLaneX(i));
-				if(i > 1) babyArrow.x += (FlxG.width / 2) + ((babyArrow.width + 10) * mobilePlayerLaneX(i));
-				babyArrow.y = FlxG.height - babyArrow.height - 105;
+				babyArrow.x = mobilePlayerLaneX(i) - 75;
+				if(i > 1) babyArrow.x = mobilePlayerLaneX(i) + 75;
+				babyArrow.y = FlxG.height - babyArrow.height - 95;
 			} else if (useMobileLayout && player < 1) {
 				babyArrow.scale.set(0.4, 0.4);
 				babyArrow.updateHitbox();
