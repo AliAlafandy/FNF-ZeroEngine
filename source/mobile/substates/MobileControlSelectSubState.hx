@@ -306,7 +306,8 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			var receptor:StrumNote = new StrumNote(0, 0, lane, 1);
 			receptor.downScroll = true;
 			receptor.updateHitbox();
-			receptor.x = firstLaneX + spacing * lane;
+			receptor.x = (firstLaneX + spacing * lane) - 75;
+			if(lane > 1) receptor.x = (firstLaneX + spacing * lane) + 75;
 			receptor.y = FlxG.height - receptor.height - 95;
 			receptor.alpha = 1;
 			receptor.visible = true;
