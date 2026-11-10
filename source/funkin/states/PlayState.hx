@@ -3818,7 +3818,23 @@ class PlayState extends MusicBeatState
 		}
 
 		if (generatedMusic)
-			notes.sort(FlxSort.byY, #if mobile (MobileData.mode == 4 ? false : ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end ? FlxSort.ASCENDING : FlxSort.DESCENDING);
+		{
+			var noteSortOrder:Int = #if mobile (MobileData.mode == 4 ? false : ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end
+				? FlxSort.ASCENDING : FlxSort.DESCENDING;
+
+			// Draw sustain pieces first so tap note heads are always rendered
+			// over them, while preserving the existing Y-based draw order.
+			notes.sort(function(order:Int, a:Note, b:Note):Int
+			{
+				if (a == null) return b == null ? 0 : -1;
+				if (b == null) return 1;
+
+				if (a.isSustainNote != b.isSustainNote)
+					return a.isSustainNote ? -1 : 1;
+
+				return FlxSort.byY(order, a, b);
+			}, noteSortOrder);
+		}
 
 		iconP1.scale.set(1.2, 1.2);
 		iconP2.scale.set(1.2, 1.2);
