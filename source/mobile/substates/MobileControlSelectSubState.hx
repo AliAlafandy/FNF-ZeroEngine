@@ -14,6 +14,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 {
 	var options:Array<String> = ['Pad-Right', 'Pad-Left', 'Pad-Custom', 'Hitbox', 'Official'];
 	var control:MobileControls;
+	var officialPlayerStrums:FlxTypedGroup<StrumNote>;
 	var leftArrow:FlxSprite;
 	var rightArrow:FlxSprite;
 	var itemText:Alphabet;
@@ -242,6 +243,14 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 	function changeOption(change:Int)
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'));
+
+		// The official layout preview is only shown while Official is selected.
+		if (officialPlayerStrums != null)
+		{
+			remove(officialPlayerStrums, true);
+			officialPlayerStrums.destroy();
+			officialPlayerStrums = null;
+		}
 		curOption += change;
 
 		if (curOption < 0)
@@ -251,9 +260,13 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 
 		switch (curOption)
 		{
-			case 0 | 1 | 3 | 4:
+			case 0 | 1 | 3:
 				reset.visible = false;
 				changeControls();
+			case 4:
+				reset.visible = false;
+				changeControls();
+				showOfficialPlayerStrums();
 			case 2:
 				reset.visible = true;
 				changeControls();
@@ -269,6 +282,38 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		}
 		updatePosText();
 		setOptionText();
+	}
+
+	/**
+	 * Displays the same four player receptors used by PlayState's Official
+	 * mobile layout. These are preview-only and are removed for every other
+	 * control option.
+	 */
+	function showOfficialPlayerStrums():Void
+	{
+		officialPlayerStrums = new FlxTypedGroup<StrumNote>();
+		officialPlayerStrums.cameras = [ui];
+		add(officialPlayerStrums);
+
+		var arrowWidth:Float = Note.swagWidth;
+		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+		var spacing:Float = arrowWidth * ((FlxG.height / FlxG.width) * 2.8) * amplification;
+		var groupWidth:Float = arrowWidth + spacing * 3;
+		var firstLaneX:Float = (FlxG.width - groupWidth) * 0.5;
+
+		for (lane in 0...4)
+		{
+			var receptor:StrumNote = new StrumNote(0, 0, lane, 1);
+			receptor.downScroll = true;
+			receptor.updateHitbox();
+			receptor.x = firstLaneX + spacing * lane;
+			receptor.y = FlxG.height - receptor.height - 95;
+			receptor.alpha = 1;
+			receptor.visible = true;
+			receptor.cameras = [ui];
+			officialPlayerStrums.add(receptor);
+			receptor.postAddedToGroup();
+		}
 	}
 
 	function setOptionText()
