@@ -51,7 +51,7 @@ class Main extends Sprite
 
 	public static var fpsVar:FPSCounter;
 
-	#if android
+	#if mobile
 	public static var waterMark:Sprite;
 	#end
 
@@ -146,7 +146,7 @@ class Main extends Sprite
 			fpsVar.visible = ClientPrefs.data.showFPS;
 		}
 
-		#if android
+		#if mobile
 		updateWaterMark();
 		Lib.current.stage.addEventListener(Event.RESIZE, onWaterMarkResize);
 		#end
@@ -194,7 +194,7 @@ class Main extends Sprite
 		});
 	}
 
-	#if android
+	#if mobile
 	static function onWaterMarkResize(event:Event):Void
 	{
 		updateWaterMarkPosition();
@@ -238,6 +238,7 @@ class Main extends Sprite
 		if (waterMark == null || Lib.current.stage == null)
 			return;
 
+		waterMark.visible = ClientPrefs.data.waterMark;
 		var stageWidth:Float = Lib.current.stage.stageWidth;
 		var stageHeight:Float = Lib.current.stage.stageHeight;
 		var margin:Float = 8;
