@@ -5,6 +5,8 @@ import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.util.FlxGradient;
 
+import funkin.data.objects.Note;
+import funkin.data.objects.StrumNote;
 import mobile.data.backend.TouchUtil;
 
 import flixel.input.touch.FlxTouch;
@@ -12,17 +14,27 @@ import flixel.ui.FlxButton as UIButton;
 
 class MobileControlSelectSubState extends MusicBeatSubstate
 {
-	var options:Array<String> = ['Pad-Right', 'Pad-Left', 'Pad-Custom', 'Hitbox', 'Official'];
+	var options:Array<String> = [
+		'Pad-Right',
+		'Pad-Left',
+		'Pad-Custom',
+		'Hitbox',
+		'Official'
+	];
 	var control:MobileControls;
 	var officialPlayerStrums:FlxTypedGroup<StrumNote>;
+
 	var leftArrow:FlxSprite;
 	var rightArrow:FlxSprite;
+
 	var itemText:Alphabet;
 	var positionText:FlxText;
 	var positionTextBg:FlxSprite;
+
 	var bg:FlxBackdrop;
 	var ui:FlxCamera;
 	var curOption:Int = MobileData.mode;
+
 	var buttonBinded:Bool = false;
 	var bindButton:TouchButton;
 	var reset:UIButton;
