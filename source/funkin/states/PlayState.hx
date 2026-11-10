@@ -3330,26 +3330,38 @@ class PlayState extends MusicBeatState
 					var receptor:StrumNote = playerStrums.members[lane];
 					if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
 
-					// Restrict each touch lane to the receptor's own hit area.
-					// Do not extend the first/last lanes to the screen edges:
-					// touches away from the arrows must not trigger notes.
-					// Extend each hit area to the midpoint between adjacent lanes,
-				// plus a small overlap. Touching the gap can then activate both
-				// neighboring directions (e.g. Left + Down).
-				var laneGap:Float = Math.max(0, Note.swagWidth - receptor.width);
-				var pairOverlap:Float = laneGap * 0.5 + 8;
-				var laneLeft:Float = receptor.x;
-				var laneRight:Float = receptor.x + receptor.width;
-				// Only the intended pairs share touch space:
-				// Left + Down (0/1) and Up + Right (2/3).
-				// The Down + Up boundary stays separate.
-				if (lane == 1 || lane == 3) laneLeft -= pairOverlap;
-				if (lane == 0 || lane == 2) laneRight += pairOverlap;
+					// Keep each arrow's normal hit area independent.
+					// The empty space BETWEEN the two intended pairs is a shared
+					// touch zone: touching there presses both directions.
+					var laneLeft:Float = receptor.x;
+					var laneRight:Float = receptor.x + receptor.width;
 					var laneTop:Float = receptor.y - receptor.height * 0.35;
 					var laneBottom:Float = receptor.y + receptor.height * 1.35;
-				if (touchPoint.x >= laneLeft && touchPoint.x <= laneRight
-					&& touchPoint.y >= laneTop && touchPoint.y <= laneBottom)
-					touched[lane] = true;
+					if (touchPoint.x >= laneLeft && touchPoint.x <= laneRight
+						&& touchPoint.y >= laneTop && touchPoint.y <= laneBottom)
+						touched[lane] = true;
+				}
+
+				// Only LEFT+DOWN (0/1) and UP+RIGHT (2/3) share their gap.
+				// The middle DOWN/UP gap remains independent.
+				for (pairStart in [0, 2]) {
+					if (pairStart + 1 >= playerStrums.length) continue;
+					var first:StrumNote = playerStrums.members[pairStart];
+					var second:StrumNote = playerStrums.members[pairStart + 1];
+					if (first == null || second == null || !first.exists || !second.exists
+						|| !first.visible || !second.visible || first.alpha <= 0.05 || second.alpha <= 0.05)
+						continue;
+
+					var gapLeft:Float = first.x + first.width;
+					var gapRight:Float = second.x;
+					var gapTop:Float = Math.max(first.y - first.height * 0.35, second.y - second.height * 0.35);
+					var gapBottom:Float = Math.min(first.y + first.height * 1.35, second.y + second.height * 1.35);
+
+					if (gapRight > gapLeft && touchPoint.x >= gapLeft && touchPoint.x <= gapRight
+						&& touchPoint.y >= gapTop && touchPoint.y <= gapBottom) {
+						touched[pairStart] = true;
+						touched[pairStart + 1] = true;
+					}
 				}
 				touchPoint.put();
 			}
