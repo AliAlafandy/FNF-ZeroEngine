@@ -340,7 +340,20 @@ class EditorPlayState extends MusicBeatSubstate
 			//trace('BEAT HIT: ' + curBeat + ', LAST HIT: ' + lastBeatHit);
 			return;
 		}
-		notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
+		var noteSortOrder:Int = #if mobile (MobileData.mode == 4 ? false : ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end
+			? FlxSort.ASCENDING : FlxSort.DESCENDING;
+
+		// Draw sustain pieces first so tap note heads stay visible above them.
+		notes.sort(function(order:Int, a:Note, b:Note):Int
+		{
+			if (a == null) return b == null ? 0 : -1;
+			if (b == null) return 1;
+
+			if (a.isSustainNote != b.isSustainNote)
+				return a.isSustainNote ? -1 : 1;
+
+			return FlxSort.byY(order, a, b);
+		}, noteSortOrder);
 
 		super.beatHit();
 		lastBeatHit = curBeat;
@@ -947,26 +960,40 @@ class EditorPlayState extends MusicBeatSubstate
 				var receptor:StrumNote = playerStrums.members[lane];
 				if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
 
-				// Match the broad, thumb-friendly FNF Mobile lane hit areas.
-				// Keep the touch target close to the actual receptor instead
-				// of treating the entire screen half as a lane.
-				// Extend each hit area to the midpoint between adjacent lanes,
-				// plus a small overlap. Touching the gap can then activate both
-				// neighboring directions (e.g. Left + Down).
-				var laneGap:Float = Math.max(0, Note.swagWidth - receptor.width);
-				var pairOverlap:Float = laneGap * 0.5 + 8;
+					// Keep each arrow's normal hit area independent.
+				// The empty space BETWEEN the two intended pairs is a shared
+				// touch zone: touching there presses both directions.
 				var laneLeft:Float = receptor.x;
 				var laneRight:Float = receptor.x + receptor.width;
-				// Only the intended pairs share touch space:
-				// Left + Down (0/1) and Up + Right (2/3).
-				// The Down + Up boundary stays separate.
-				if (lane == 1 || lane == 3) laneLeft -= pairOverlap;
-				if (lane == 0 || lane == 2) laneRight += pairOverlap;
 				var laneTop:Float = receptor.y - receptor.height * 0.35;
 				var laneBottom:Float = receptor.y + receptor.height * 1.35;
 				if (point.x >= laneLeft && point.x <= laneRight
 					&& point.y >= laneTop && point.y <= laneBottom)
 					touched[lane] = true;
+			}
+
+			// Only LEFT+DOWN (0/1) and UP+RIGHT (2/3) share their gap.
+			// The middle DOWN/UP gap remains independent.
+			for (pairStart in [0, 2])
+			{
+				if (pairStart + 1 >= playerStrums.length) continue;
+				var first:StrumNote = playerStrums.members[pairStart];
+				var second:StrumNote = playerStrums.members[pairStart + 1];
+				if (first == null || second == null || !first.exists || !second.exists
+					|| !first.visible || !second.visible || first.alpha <= 0.05 || second.alpha <= 0.05)
+					continue;
+
+				var gapLeft:Float = first.x + first.width;
+				var gapRight:Float = second.x;
+				var gapTop:Float = Math.max(first.y - first.height * 0.35, second.y - second.height * 0.35);
+				var gapBottom:Float = Math.min(first.y + first.height * 1.35, second.y + second.height * 1.35);
+
+				if (gapRight > gapLeft && point.x >= gapLeft && point.x <= gapRight
+					&& point.y >= gapTop && point.y <= gapBottom)
+				{
+					touched[pairStart] = true;
+					touched[pairStart + 1] = true;
+				}
 			}
 			point.put();
 		}
