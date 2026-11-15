@@ -23,6 +23,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 	];
 	var control:MobileControls;
 	var officialPlayerStrums:FlxTypedGroup<StrumNote>;
+	var officialStrumTouchState:Array<Bool> = [false, false, false, false];
 
 	var leftArrow:FlxSprite;
 	var rightArrow:FlxSprite;
@@ -234,6 +235,9 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			});
 		}
 
+		if (curOption == 4)
+			updateOfficialStrumTouch();
+
 		tweenieShit += 180 * elapsed;
 
 		super.update(elapsed);
@@ -301,31 +305,101 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 	 * mobile layout. These are preview-only and are removed for every other
 	 * control option.
 	 */
+	private inline function mobilePlayerNoteSpacing():Float
+	{
+		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
+		return Note.swagWidth * ((FlxG.height / FlxG.width) * 2.8) * amplification;
+	}
+
+	private inline function mobilePlayerLaneX(lane:Int):Float
+	{
+		var groupWidth:Float = Note.swagWidth + mobilePlayerNoteSpacing() * 3;
+		return (FlxG.width - groupWidth) * 0.5 + mobilePlayerNoteSpacing() * lane;
+	}
+
+	/**
+	 * Preview receptors use the exact same coordinates as PlayState and
+	 * EditorPlayState's Official mobile player strumlines.
+	 */
 	function showOfficialPlayerStrums():Void
 	{
 		officialPlayerStrums = new FlxTypedGroup<StrumNote>();
 		officialPlayerStrums.cameras = [ui];
 		add(officialPlayerStrums);
-
-		var arrowWidth:Float = Note.swagWidth;
-		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
-		var spacing:Float = arrowWidth * ((FlxG.height / FlxG.width) * 2.8) * amplification;
-		var groupWidth:Float = arrowWidth + spacing * 3;
-		var firstLaneX:Float = (FlxG.width - groupWidth) * 0.5;
+		officialStrumTouchState = [false, false, false, false];
 
 		for (lane in 0...4)
 		{
 			var receptor:StrumNote = new StrumNote(0, 0, lane, 1);
 			receptor.downScroll = true;
 			receptor.updateHitbox();
-			receptor.x = (firstLaneX + spacing * lane) - 75;
-			if(lane > 1) receptor.x = (firstLaneX + spacing * lane) + 75;
+			receptor.x = mobilePlayerLaneX(lane) - (lane < 2 ? 75 : -75);
 			receptor.y = FlxG.height - receptor.height - 95;
 			receptor.alpha = 1;
 			receptor.visible = true;
 			receptor.cameras = [ui];
 			officialPlayerStrums.add(receptor);
 			receptor.postAddedToGroup();
+		}
+	}
+
+	/**
+	 * Same shared-pair touch behavior as PlayState/EditorPlayState:
+	 * the gap between LEFT+DOWN or UP+RIGHT presses both receptors.
+	 */
+	function updateOfficialStrumTouch():Void
+	{
+		if (officialPlayerStrums == null) return;
+
+		var touched:Array<Bool> = [false, false, false, false];
+		for (touch in FlxG.touches.list)
+		{
+			if (!touch.pressed) continue;
+			var point:FlxPoint = touch.getScreenPosition(ui, FlxPoint.get());
+
+			for (lane in 0...4)
+			{
+				var receptor:StrumNote = officialPlayerStrums.members[lane];
+				if (receptor == null || !receptor.exists) continue;
+
+				var laneLeft:Float = receptor.x;
+				var laneRight:Float = receptor.x + receptor.width;
+				var laneTop:Float = receptor.y - receptor.height * 0.35;
+				var laneBottom:Float = receptor.y + receptor.height * 1.35;
+				if (point.x >= laneLeft && point.x <= laneRight
+					&& point.y >= laneTop && point.y <= laneBottom)
+					touched[lane] = true;
+			}
+
+			for (pairStart in [0, 2])
+			{
+				var first:StrumNote = officialPlayerStrums.members[pairStart];
+				var second:StrumNote = officialPlayerStrums.members[pairStart + 1];
+				if (first == null || second == null || !first.exists || !second.exists) continue;
+
+				var gapLeft:Float = first.x + first.width;
+				var gapRight:Float = second.x;
+				var gapTop:Float = Math.max(first.y - first.height * 0.35, second.y - second.height * 0.35);
+				var gapBottom:Float = Math.min(first.y + first.height * 1.35, second.y + second.height * 1.35);
+				if (gapRight > gapLeft && point.x >= gapLeft && point.x <= gapRight
+					&& point.y >= gapTop && point.y <= gapBottom)
+				{
+					touched[pairStart] = true;
+					touched[pairStart + 1] = true;
+				}
+			}
+			point.put();
+		}
+
+		for (lane in 0...4)
+		{
+			var receptor:StrumNote = officialPlayerStrums.members[lane];
+			if (receptor == null) continue;
+			if (touched[lane] && !officialStrumTouchState[lane])
+				receptor.playAnim('pressed');
+			else if (!touched[lane] && officialStrumTouchState[lane])
+				receptor.playAnim('static');
+			officialStrumTouchState[lane] = touched[lane];
 		}
 	}
 
