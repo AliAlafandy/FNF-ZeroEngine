@@ -297,6 +297,8 @@ class MobileFunctions
 				return 'custom';
 			case 3:
 				return 'hitbox';
+			case 4:
+				return 'official';
 			default:
 				return 'none';
 		}
