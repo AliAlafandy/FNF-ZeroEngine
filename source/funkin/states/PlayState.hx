@@ -2212,6 +2212,23 @@ class PlayState extends MusicBeatState
 			}
 		}
 
+		// Sort every frame after spawning: sustain pieces must stay behind
+		// tap note heads even when new notes enter the group mid-song.
+		if (generatedMusic && notes != null && notes.length > 1)
+		{
+			var noteSortOrder:Int = #if mobile (MobileData.mode == 4 ? false : ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end
+				? FlxSort.ASCENDING : FlxSort.DESCENDING;
+
+			notes.sort(function(order:Int, a:Note, b:Note):Int
+			{
+				if (a == null) return b == null ? 0 : -1;
+				if (b == null) return 1;
+				if (a.isSustainNote != b.isSustainNote)
+					return a.isSustainNote ? -1 : 1;
+				return FlxSort.byY(order, a, b);
+			}, noteSortOrder);
+		}
+
 		if (generatedMusic)
 		{
 			if(!inCutscene)
@@ -3328,7 +3345,7 @@ class PlayState extends MusicBeatState
 				var touchPoint:FlxPoint = touch.getScreenPosition(camHUD, FlxPoint.get());
 				for (lane in 0...playerStrums.length) {
 					var receptor:StrumNote = playerStrums.members[lane];
-					if (receptor == null || !receptor.exists || !receptor.visible || receptor.alpha <= 0.05) continue;
+					if (receptor == null || !receptor.exists) continue;
 
 					// Keep each arrow's normal hit area independent.
 					// The empty space BETWEEN the two intended pairs is a shared
@@ -3348,8 +3365,7 @@ class PlayState extends MusicBeatState
 					if (pairStart + 1 >= playerStrums.length) continue;
 					var first:StrumNote = playerStrums.members[pairStart];
 					var second:StrumNote = playerStrums.members[pairStart + 1];
-					if (first == null || second == null || !first.exists || !second.exists
-						|| !first.visible || !second.visible || first.alpha <= 0.05 || second.alpha <= 0.05)
+					if (first == null || second == null || !first.exists || !second.exists)
 						continue;
 
 					var gapLeft:Float = first.x + first.width;
@@ -3817,24 +3833,7 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
-		if (generatedMusic)
-		{
-			var noteSortOrder:Int = #if mobile (MobileData.mode == 4 ? false : ClientPrefs.data.downScroll) #else ClientPrefs.data.downScroll #end
-				? FlxSort.ASCENDING : FlxSort.DESCENDING;
 
-			// Draw sustain pieces first so tap note heads are always rendered
-			// over them, while preserving the existing Y-based draw order.
-			notes.sort(function(order:Int, a:Note, b:Note):Int
-			{
-				if (a == null) return b == null ? 0 : -1;
-				if (b == null) return 1;
-
-				if (a.isSustainNote != b.isSustainNote)
-					return a.isSustainNote ? -1 : 1;
-
-				return FlxSort.byY(order, a, b);
-			}, noteSortOrder);
-		}
 
 		iconP1.scale.set(1.2, 1.2);
 		iconP2.scale.set(1.2, 1.2);
