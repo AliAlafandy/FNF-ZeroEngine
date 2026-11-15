@@ -211,8 +211,12 @@ class FunkinLua {
 		set('splashSkinPostfix', NoteSplash.getSplashSkinPostfix());
 		set('splashAlpha', ClientPrefs.data.splashAlpha);
 
-		// build target (windows, mac, linux, etc.)
+		// build target (windows, mac, linux, android, ios, etc.)
 		set('buildTarget', LuaUtils.getBuildTarget());
+
+		#if mobile
+		set('mobileControlMode', MobileData.mode);
+		#end
 
 		for (name => func in customFunctions)
 		{
