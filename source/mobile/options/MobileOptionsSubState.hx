@@ -147,8 +147,9 @@ class MobileOptionsSubState extends BaseOptionsMenu
 
 	function onChangeWaterMark()
 	{
-		if(Main.waterMark != null)
-			Main.waterMark.visible = ClientPrefs.data.waterMark;
+		// Recreate/remove the watermark immediately so enabling it also works
+		// when no watermark sprite existed when the options menu was opened.
+		Main.updateWaterMark();
 	}
 	#end
 
