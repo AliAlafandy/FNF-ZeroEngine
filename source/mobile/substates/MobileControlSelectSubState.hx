@@ -260,7 +260,6 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'));
 
-		// The official layout preview is only shown while Official is selected.
 		if (officialPlayerStrums != null)
 		{
 			remove(officialPlayerStrums, true);
@@ -335,10 +334,6 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		}
 	}
 
-	/**
-	 * Same shared-pair touch behavior as PlayState/EditorPlayState:
-	 * the gap between LEFT+DOWN or UP+RIGHT presses both receptors.
-	 */
 	function updateOfficialStrumTouch():Void
 	{
 		if (officialPlayerStrums == null) return;
