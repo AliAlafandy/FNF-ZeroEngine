@@ -96,9 +96,7 @@ class Main extends Sprite
 		if (stage != null)
 		{
 			init();
-		}
-		else
-		{
+		} else {
 			addEventListener(Event.ADDED_TO_STAGE, init);
 		}
 	}
@@ -146,11 +144,6 @@ class Main extends Sprite
 			fpsVar.visible = ClientPrefs.data.showFPS;
 		}
 
-		#if mobile
-		updateWaterMark();
-		Lib.current.stage.addEventListener(Event.RESIZE, onWaterMarkResize);
-		#end
-
 		#if linux
 		var icon = Image.fromFile("icon.png");
 		Lib.current.stage.window.setIcon(icon);
@@ -176,6 +169,8 @@ class Main extends Sprite
 		#if mobile
 		LimeSystem.allowScreenTimeout = ClientPrefs.data.screensaver;
 		FlxG.scaleMode = new MobileScaleMode();
+		updateWaterMark();
+		Lib.current.stage.addEventListener(Event.RESIZE, onWaterMarkResize);
 		#end
 
 		// shader coords fix
@@ -224,7 +219,9 @@ class Main extends Sprite
 		var bitmapData = Assets.getBitmapData(imagePath);
 		waterMark = new Sprite();
 		waterMark.addChild(new Bitmap(bitmapData));
-		//waterMark.scale.set(2, 2);
+		waterMark.scale.x = 2;
+		waterMark.scale.y = 2;
+		// waterMark.scale.set(2, 2);
 		waterMark.alpha = 0.6; // 0.4
 		updateWaterMarkPosition();
 		Lib.current.stage.addChild(waterMark);
@@ -236,10 +233,9 @@ class Main extends Sprite
 	static function updateWaterMarkPosition():Void
 	{
 		if (waterMark == null || Lib.current.stage == null)
+			// waterMark.visible = ClientPrefs.data.waterMark;
 			return;
 
-		// Keep the watermark at the bottom-right of the actual screen.
-		// This works whether or not the game has letterbox bars.
 		var stageWidth:Float = Lib.current.stage.stageWidth;
 		var stageHeight:Float = Lib.current.stage.stageHeight;
 		var margin:Float = 8;
