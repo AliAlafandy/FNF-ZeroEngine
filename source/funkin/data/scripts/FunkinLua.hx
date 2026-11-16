@@ -214,9 +214,9 @@ class FunkinLua {
 		// build target (windows, mac, linux, android, ios, etc.)
 		set('buildTarget', LuaUtils.getBuildTarget());
 
-		#if mobile
+		//#if mobile
 		set('mobileControlMode', MobileData.mode);
-		#end
+		//#end
 
 		for (name => func in customFunctions)
 		{
