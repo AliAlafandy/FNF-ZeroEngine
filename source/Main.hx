@@ -163,14 +163,14 @@ class Main extends Sprite
 		#end
 
 		#if android
+		updateWaterMark();
 		FlxG.android.preventDefaultKeys = [BACK];
+		Lib.current.stage.addEventListener(Event.RESIZE, onWaterMarkResize);
 		#end
 
 		#if mobile
 		LimeSystem.allowScreenTimeout = ClientPrefs.data.screensaver;
 		FlxG.scaleMode = new MobileScaleMode();
-		updateWaterMark();
-		Lib.current.stage.addEventListener(Event.RESIZE, onWaterMarkResize);
 		#end
 
 		// shader coords fix
@@ -189,7 +189,7 @@ class Main extends Sprite
 		});
 	}
 
-	#if mobile
+	#if android
 	static function onWaterMarkResize(event:Event):Void
 	{
 		updateWaterMarkPosition();
