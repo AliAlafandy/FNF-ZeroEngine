@@ -300,11 +300,6 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		setOptionText();
 	}
 
-	/**
-	 * Displays the same four player receptors used by PlayState's Official
-	 * mobile layout. These are preview-only and are removed for every other
-	 * control option.
-	 */
 	private inline function mobilePlayerNoteSpacing():Float
 	{
 		var amplification:Float = (FlxG.width / FlxG.height) / (FlxG.initialWidth / FlxG.initialHeight);
@@ -317,10 +312,6 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		return (FlxG.width - groupWidth) * 0.5 + mobilePlayerNoteSpacing() * lane;
 	}
 
-	/**
-	 * Preview receptors use the exact same coordinates as PlayState and
-	 * EditorPlayState's Official mobile player strumlines.
-	 */
 	function showOfficialPlayerStrums():Void
 	{
 		officialPlayerStrums = new FlxTypedGroup<StrumNote>();
@@ -333,7 +324,8 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			var receptor:StrumNote = new StrumNote(0, 0, lane, 1);
 			receptor.downScroll = true;
 			receptor.updateHitbox();
-			receptor.x = mobilePlayerLaneX(lane) - (lane < 2 ? 75 : -75);
+			receptor.x = mobilePlayerLaneX(lane) - 75;
+			if(lane > 1) receptor.x = mobilePlayerLaneX(lane) + 75;
 			receptor.y = FlxG.height - receptor.height - 95;
 			receptor.alpha = 1;
 			receptor.visible = true;
