@@ -110,19 +110,14 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			'waterMark',
 			'bool');
 		addOption(option);
-		option.onChange = onChangeWaterMark;
+		option.onChange = () -> onChangeWaterMark;
 
 		option = new Option('Water Mark Style:',
 			"What should the Water Mark style?",
 			'watermarkStyle',
 			'string',
 			['Psych Engine', 'Mods Engine', 'Zero Engine']);
-		option.onChange = () ->
-		{
-			#if mobile
-			Main.updateWaterMark();
-			#end
-		};
+		option.onChange = () -> Main.updateWaterMark();
 		addOption(option);
 		#end
 
@@ -147,8 +142,6 @@ class MobileOptionsSubState extends BaseOptionsMenu
 
 	function onChangeWaterMark()
 	{
-		// Recreate/remove the watermark immediately so enabling it also works
-		// when no watermark sprite existed when the options menu was opened.
 		Main.updateWaterMark();
 	}
 	#end
