@@ -237,7 +237,7 @@ class Main extends Sprite
 
 		var stageWidth:Float = Lib.current.stage.stageWidth;
 		var stageHeight:Float = Lib.current.stage.stageHeight;
-		var margin:Float = 8;
+		var margin:Float = 32; //8
 
 		waterMark.x = Math.max(0, stageWidth - margin - waterMark.width);
 		waterMark.y = Math.max(0, stageHeight - margin - waterMark.height);
