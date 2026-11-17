@@ -307,8 +307,10 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 
 	private inline function mobilePlayerLaneX(lane:Int):Float
 	{
-		var groupWidth:Float = Note.swagWidth + mobilePlayerNoteSpacing() * 3;
-		return (FlxG.width - groupWidth) * 0.5 + mobilePlayerNoteSpacing() * lane;
+		var arrowWidth:Float = Note.swagWidth;
+		var spacing:Float = mobilePlayerNoteSpacing();
+		var groupWidth:Float = arrowWidth + spacing * 3;
+		return (FlxG.width - groupWidth) * 0.5 + spacing * lane;
 	}
 
 	function showOfficialPlayerStrums():Void
@@ -318,13 +320,16 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		add(officialPlayerStrums);
 		officialStrumTouchState = [false, false, false, false];
 
-		for (lane in 0...4)
+		var strumLineX:Float = 0;
+		var strumLineY:Float = 0;
+
+		for (i in 0...4)
 		{
-			var receptor:StrumNote = new StrumNote(0, 0, lane, 1);
+			var receptor:StrumNote = new StrumNote(strumLineX, strumLineY, i, 1);
 			receptor.downScroll = true;
 			receptor.updateHitbox();
-			receptor.x = mobilePlayerLaneX(lane) - 75;
-			if(lane > 1) receptor.x = mobilePlayerLaneX(lane) + 75;
+			receptor.x = mobilePlayerLaneX(i) - 75;
+			if(i > 1) receptor.x = mobilePlayerLaneX(i) + 75;
 			receptor.y = FlxG.height - receptor.height - 95;
 			receptor.alpha = 1;
 			receptor.visible = true;
