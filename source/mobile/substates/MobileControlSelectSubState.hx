@@ -320,7 +320,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		add(officialPlayerStrums);
 		officialStrumTouchState = [false, false, false, false];
 
-		var strumLineX:Float = -850;
+		var strumLineX:Float = -1050;
 		var strumLineY:Float = 0;
 
 		for (i in 0...4)
