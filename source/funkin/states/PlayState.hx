@@ -1961,9 +1961,6 @@ class PlayState extends MusicBeatState
 				opponentStrums.add(babyArrow);
 			}
 
-			strumLineNotes.add(babyArrow);
-			babyArrow.postAddedToGroup();
-
 			#if mobile
 			if (useMobileLayout && player == 1)
 			{
@@ -1974,10 +1971,13 @@ class PlayState extends MusicBeatState
 			} else if (useMobileLayout && player < 1) {
 				babyArrow.scale.set(0.4, 0.4);
 				babyArrow.updateHitbox();
-				babyArrow.x = 50 + (babyArrow.width + 2) * i;
+				babyArrow.x += 45; // + (babyArrow.width + 4) * i
 				babyArrow.y = 55;
 			}
 			#end
+
+			strumLineNotes.add(babyArrow);
+			babyArrow.postAddedToGroup();
 		}
 	}
 	override function openSubState(SubState:FlxSubState)
