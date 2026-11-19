@@ -320,7 +320,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		add(officialPlayerStrums);
 		officialStrumTouchState = [false, false, false, false];
 
-		var strumLineX:Float = -1050;
+		var strumLineX:Float = 370 + (560 / 4); //-1050
 		var strumLineY:Float = 0;
 
 		for (i in 0...4)
@@ -328,8 +328,8 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			var receptor:StrumNote = new StrumNote(strumLineX, strumLineY, i, 1);
 			receptor.downScroll = true;
 			receptor.updateHitbox();
-			receptor.x = mobilePlayerLaneX(i) - 75;
-			if(i > 1) receptor.x = mobilePlayerLaneX(i) + 75;
+			/*receptor.x = mobilePlayerLaneX(i) - 75;
+			if(i > 1) receptor.x = mobilePlayerLaneX(i) + 75;*/
 			receptor.y = FlxG.height - receptor.height - 95;
 			receptor.alpha = 1;
 			receptor.visible = true;
