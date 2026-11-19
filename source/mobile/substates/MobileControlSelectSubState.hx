@@ -316,7 +316,6 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 	function showOfficialPlayerStrums():Void
 	{
 		officialPlayerStrums = new FlxTypedGroup<StrumNote>();
-		officialPlayerStrums.postAddedToGroup();
 		officialPlayerStrums.cameras = [ui];
 		add(officialPlayerStrums);
 		officialStrumTouchState = [false, false, false, false];
@@ -336,6 +335,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			receptor.visible = true;
 			receptor.cameras = [ui];
 			officialPlayerStrums.add(receptor);
+			receptor.postAddedToGroup();
 		}
 	}
 
