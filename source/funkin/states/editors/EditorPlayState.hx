@@ -655,7 +655,7 @@ class EditorPlayState extends MusicBeatSubstate
 			} else if (useMobileLayout && player < 1) {
 				babyArrow.scale.set(0.4, 0.4);
 				babyArrow.updateHitbox();
-				babyArrow.x = 50 + (babyArrow.width * i) + 2;
+				babyArrow.x = 50 + (babyArrow.width + 2) * i;
 				babyArrow.y = 55;
 			}
 			#end
