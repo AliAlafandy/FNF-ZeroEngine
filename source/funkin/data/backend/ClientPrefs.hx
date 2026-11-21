@@ -23,8 +23,6 @@ import funkin.states.TitleState;
 	public var popUpRating:Bool = true;
 	public var vsync:Bool = false;
 	public var gameOverVibration:Bool = false;
-	public var waterMark:Bool = false;
-	public var watermarkStyle:String = 'Zero Engine';
 
 	// Other Releated
 	public var downScroll:Bool = false;
