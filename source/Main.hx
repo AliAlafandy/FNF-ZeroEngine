@@ -8,10 +8,7 @@ import flixel.FlxState;
 
 import haxe.io.Path;
 
-import openfl.Assets;
 import openfl.Lib;
-import openfl.display.Bitmap;
-import openfl.display.BitmapData;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.display.StageScaleMode;
@@ -51,9 +48,6 @@ class Main extends Sprite
 
 	public static var fpsVar:FPSCounter;
 
-	#if mobile
-	public static var waterMark:Sprite;
-	#end
 
 	#if mobile
 	public static final platform:String = "Phones";
@@ -163,9 +157,7 @@ class Main extends Sprite
 		#end
 
 		#if android
-		updateWaterMark();
 		FlxG.android.preventDefaultKeys = [BACK];
-		Lib.current.stage.addEventListener(Event.RESIZE, onWaterMarkResize);
 		#end
 
 		#if mobile
@@ -188,62 +180,6 @@ class Main extends Sprite
 			resetSpriteCache(FlxG.game);
 		});
 	}
-
-	#if android
-	static function onWaterMarkResize(event:Event):Void
-	{
-		updateWaterMarkPosition();
-	}
-
-	public static function updateWaterMark():Void
-	{
-		if (waterMark != null && waterMark.parent != null) waterMark.parent.removeChild(waterMark);
-		waterMark = null;
-
-		if (!ClientPrefs.data.waterMark || Lib.current.stage == null) return;
-
-		var imagePath:String = switch (ClientPrefs.data.watermarkStyle)
-		{
-			case 'Psych Engine': "assets/shared/images/psychIcon.png";
-			case 'Mods Engine': "assets/shared/images/modsIcon.png";
-			case 'Zero Engine': "assets/shared/images/zeroIcon.png";
-			default: "assets/shared/images/zeroIcon.png";
-		};
-
-		if (!Assets.exists(imagePath))
-		{
-			trace('Watermark image not found: ' + imagePath);
-			return;
-		}
-
-		var bitmapData = Assets.getBitmapData(imagePath);
-		waterMark = new Sprite();
-		waterMark.addChild(new Bitmap(bitmapData));
-		waterMark.scaleX = 2;
-		waterMark.scaleY = 2;
-		waterMark.alpha = 0.6; // 0.4
-		updateWaterMarkPosition();
-		Lib.current.stage.addChild(waterMark);
-		if(waterMark != null) {
-			waterMark.visible = ClientPrefs.data.waterMark;
-		}
-	}
-
-	static function updateWaterMarkPosition():Void
-	{
-		if (waterMark == null || Lib.current.stage == null)
-			// waterMark.visible = ClientPrefs.data.waterMark;
-			return;
-
-		var stageWidth:Float = Lib.current.stage.stageWidth;
-		var stageHeight:Float = Lib.current.stage.stageHeight;
-		var margin:Float = 32; //8
-
-		waterMark.x = Math.max(0, stageWidth - margin - waterMark.width);
-		waterMark.y = Math.max(0, stageHeight - margin - waterMark.height);
-		waterMark.visible = ClientPrefs.data.waterMark;
-	}
-	#end
 
 	static function resetSpriteCache(sprite:Sprite):Void {
 		@:privateAccess {
