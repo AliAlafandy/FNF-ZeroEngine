@@ -1,7 +1,5 @@
 package mobile.options;
 
-import Main;
-
 import mobile.data.backend.MobileScaleMode;
 import mobile.data.backend.MobileData;
 
@@ -105,20 +103,6 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			'bool');
 		addOption(option);
 
-		option = new Option('Water Mark',
-			"If checked, it will add water mark like icon.",
-			'waterMark',
-			'bool');
-		addOption(option);
-		option.onChange = () -> onChangeWaterMark;
-
-		option = new Option('Water Mark Style:',
-			"What should the Water Mark style?",
-			'watermarkStyle',
-			'string',
-			['Psych Engine', 'Mods Engine', 'Zero Engine']);
-		option.onChange = () -> Main.updateWaterMark();
-		addOption(option);
 		#end
 
 		super();
@@ -140,10 +124,6 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			trace('Failed to remove last directory. (${e.message})');
 	}
 
-	function onChangeWaterMark()
-	{
-		Main.updateWaterMark();
-	}
 	#end
 
 	override public function destroy()
